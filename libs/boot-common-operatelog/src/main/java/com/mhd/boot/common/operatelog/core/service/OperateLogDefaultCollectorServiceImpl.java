@@ -1,6 +1,6 @@
 package com.mhd.boot.common.operatelog.core.service;
 
-import com.mhd.plugin.operatelog.core.vo.OperateLogVO;
+import com.mhd.boot.common.operatelog.core.vo.OperateLogVO;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 
