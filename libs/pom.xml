@@ -18,6 +18,10 @@
         <module>boot-common-web</module>
         <module>boot-ai</module>
         <module>boot-common-sftp</module>
+        <module>boot-common-security</module>
+        <module>boot-common-job</module>
+        <module>boot-common-operatelog</module>
+        <module>boot-common-idempotent</module>
     </modules>
 
 </project>
