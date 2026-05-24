@@ -2,6 +2,8 @@ package com.mhd.boot.common.utils;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.springframework.util.AntPathMatcher;
 
 import java.util.List;
@@ -11,9 +13,8 @@ import java.util.List;
  *
  * @author zhao-hao-dong
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class StringUtils extends org.apache.commons.lang3.StringUtils {
-    private StringUtils() {
-    }
 
     /**
      * 获取参数不为空值
