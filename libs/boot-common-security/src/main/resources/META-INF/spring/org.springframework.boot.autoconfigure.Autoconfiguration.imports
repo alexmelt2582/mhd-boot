@@ -1,0 +1,2 @@
+com.mhd.boot.common.security.config.SecurityAutoConfiguration
+com.mhd.boot.common.security.config.SecurityConfig
