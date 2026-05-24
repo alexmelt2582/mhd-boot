@@ -1,0 +1,9 @@
+spring:
+  data:
+    redis:
+      host: localhost
+      password: BMxddVHuokdFYFKoYsm0ag==
+      port: 6379
+mhd:
+  idempotent:
+    key-store-type: redis
