@@ -17,6 +17,7 @@
         <module>boot-common-mybatis</module>
         <module>boot-common-web</module>
         <module>boot-ai</module>
+        <module>boot-common-sftp</module>
     </modules>
 
 </project>
