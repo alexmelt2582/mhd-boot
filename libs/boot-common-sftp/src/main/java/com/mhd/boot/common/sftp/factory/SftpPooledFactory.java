@@ -148,10 +148,13 @@ public class SftpPooledFactory extends BasePooledObjectFactory<ChannelSftp> {
      */
     @Override
     public boolean validateObject(PooledObject<ChannelSftp> p) {
+        ChannelSftp channel = p.getObject();
+        if (channel == null || !channel.isConnected()) {
+            return false;
+        }
         try {
-            // 执行stat(".")命令，这是一个轻量操作，不会产生大量数据传输
-            // 如果连接已断开，此操作会抛出异常
-            p.getObject().stat(".");
+            // stat(".")命令，这是一个轻量操作，不会产生大量数据传输，此处不适用，如果用户cd 到一个不存在的目录就会出现问题
+            channel.pwd();
             return true;
         } catch (Exception e) {
             log.warn("SFTP连接校验失败，连接已失效，将被销毁重建");

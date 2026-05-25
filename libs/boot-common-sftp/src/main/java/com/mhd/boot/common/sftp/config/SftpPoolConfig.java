@@ -78,6 +78,12 @@ public class SftpPoolConfig {
     private long minEvictableIdleTimeMillis = 300000;
 
     /**
+     * 从池中借出连接的最大等待时间，单位毫秒，默认 10秒
+     * 如果超过这个时间还没有空闲连接，抛出异常，防止线程无限阻塞
+     */
+    private long maxWaitMillis = 10000;
+
+    /**
      * 服务器保活心跳间隔，单位毫秒，默认30秒
      * 防止长时间空闲导致服务器或中间设备断开连接
      */

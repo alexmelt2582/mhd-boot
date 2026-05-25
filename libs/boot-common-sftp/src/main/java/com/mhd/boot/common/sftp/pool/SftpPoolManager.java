@@ -2,6 +2,7 @@ package com.mhd.boot.common.sftp.pool;
 
 import com.jcraft.jsch.ChannelSftp;
 import com.mhd.boot.common.sftp.config.SftpPoolConfig;
+import com.mhd.boot.common.sftp.exception.SftpTransferException;
 import com.mhd.boot.common.sftp.factory.SftpPooledFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.pool2.impl.GenericObjectPool;
@@ -60,6 +61,9 @@ public class SftpPoolManager {
         poolConfig.setTimeBetweenEvictionRuns(Duration.ofMillis(config.getTimeBetweenEvictionRunsMillis()));
         poolConfig.setMinEvictableIdleDuration(Duration.ofMillis(config.getMinEvictableIdleTimeMillis()));
 
+        // 设置获取连接的超时时间
+        poolConfig.setMaxWait(Duration.ofMillis(config.getMaxWaitMillis()));
+
         // 创建连接池实例
         this.pool = new GenericObjectPool<>(factory, poolConfig);
 
@@ -78,10 +82,19 @@ public class SftpPoolManager {
      * @throws Exception 如果无法获取连接（如认证失败、网络不通等）
      */
     public ChannelSftp borrow() throws Exception {
-        ChannelSftp channel = pool.borrowObject();
-        log.debug("从连接池借出SFTP连接，当前池状态：活跃={}, 空闲={}",
-                pool.getNumActive(), pool.getNumIdle());
-        return channel;
+        try {
+            ChannelSftp channel = pool.borrowObject();
+            log.debug("从连接池借出SFTP连接，当前池状态：活跃={}, 空闲={}", pool.getNumActive(), pool.getNumIdle());
+            return channel;
+        } catch (java.util.NoSuchElementException e) {
+            // 这种情况通常是池子耗尽且超时了
+            log.error("获取SFTP连接超时，当前池状态：活跃={}, 最大连接数={}", pool.getNumActive(), config.getMaxTotal());
+            throw new RuntimeException(new SftpTransferException(
+                    SftpTransferException.POOL_EXHAUSTED,
+                    "SFTP连接池已满，无法获取连接，请稍后重试",
+                    e
+            ));
+        }
     }
 
     /**

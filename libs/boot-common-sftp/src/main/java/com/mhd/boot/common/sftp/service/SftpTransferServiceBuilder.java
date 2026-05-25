@@ -11,8 +11,20 @@ import com.mhd.boot.common.sftp.pool.SftpPoolManager;
  * @author zhao-hao-dong
  **/
 public class SftpTransferServiceBuilder {
-    /** SFTP连接池配置 */
+    /**
+     * SFTP连接池配置
+     */
     private final SftpPoolConfig config;
+
+    /**
+     * 最大重试次数（不含首次尝试）
+     */
+    private int maxRetries = 2;
+
+    /**
+     * 重试间隔（毫秒）
+     */
+    private long retryIntervalMillis = 1000L;
 
     /**
      * 创建构建器实例
@@ -99,6 +111,28 @@ public class SftpTransferServiceBuilder {
     }
 
     /**
+     * 设置最大重试次数（不含首次尝试）
+     *
+     * @param maxRetries 最大重试次数
+     * @return 构建器实例
+     */
+    public SftpTransferServiceBuilder maxRetries(int maxRetries) {
+        this.maxRetries = maxRetries;
+        return this;
+    }
+
+    /**
+     * 设置重试间隔（毫秒）
+     *
+     * @param retryIntervalMillis 重试间隔
+     * @return 构建器实例
+     */
+    public SftpTransferServiceBuilder retryIntervalMillis(long retryIntervalMillis) {
+        this.retryIntervalMillis = retryIntervalMillis;
+        return this;
+    }
+
+    /**
      * 构建SftpTransferService实例
      *
      * @return 配置完成的SftpTransferService
@@ -116,6 +150,6 @@ public class SftpTransferServiceBuilder {
             throw new IllegalStateException("SFTP密码不能为空");
         }
         SftpPoolManager poolManager = new SftpPoolManager(config);
-        return new SftpTransferService(poolManager);
+        return new SftpTransferService(poolManager, maxRetries, retryIntervalMillis);
     }
 }
