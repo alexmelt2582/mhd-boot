@@ -158,9 +158,7 @@ public class SftpTransferService {
             }
             // 步骤5：确保远程目录存在，如果不存在则自动创建
             ensureRemoteDirExists(channel, remoteDir);
-            // 步骤6：切换到远程目标目录
-            channel.cd(remoteDir);
-            // 步骤7：使用流式传输上传文件，避免大文件占用过多内存
+            // 步骤6：使用流式传输上传文件，避免大文件占用过多内存
             try (FileInputStream fis = new FileInputStream(localFile)) {
                 // 可选地启用传输进度回调
                 if (progressMonitor == null) {
@@ -175,7 +173,7 @@ public class SftpTransferService {
                     formatFileSize(localFile.length()), cost);
 
         } catch (Exception e) {
-            // 步骤8：传输异常时，废弃当前连接，避免坏连接被复用
+            // 步骤7：传输异常时，废弃当前连接，避免坏连接被复用
             if (channel != null) {
                 poolManager.invalidateObject(channel);
                 channel = null;
@@ -183,7 +181,7 @@ public class SftpTransferService {
             throw SftpTransferException.fromJSchException(
                     new Exception(e), "上传文件 " + localFilePath + " 到 " + remoteDir);
         } finally {
-            // 步骤9：如果连接正常，归还到连接池
+            // 步骤8：如果连接正常，归还到连接池
             if (channel != null) {
                 poolManager.returnObject(channel);
             }
