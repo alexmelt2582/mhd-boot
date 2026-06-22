@@ -101,7 +101,7 @@ public class FileParseService {
     }
 
     /**
-     * 计算文件的 SHA-256 哈希值（用于简历去重）
+     * 计算文件的 SHA-256 哈希值
      *
      * @param inputStream 文件输入流
      * @return 十六进制 SHA-256 哈希字符串（小写）

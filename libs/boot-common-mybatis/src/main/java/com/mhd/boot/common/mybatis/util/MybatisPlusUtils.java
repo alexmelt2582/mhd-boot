@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.mhd.boot.common.mybatis.domain.PageParam;
 import com.mhd.boot.common.mybatis.domain.SortableParam;
-import com.mhd.boot.common.utils.CollectionUtils;
+import com.mhd.boot.common.utils.collection.CollectionUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;

@@ -59,7 +59,7 @@ public class FileStorageService {
      * 通用文件上传，Key 格式为 {prefix}/{uuid}.{ext}
      *
      * @param file   MultipartFile 文件对象
-     * @param prefix 存储路径前缀（如 "resumes"、"knowledge"）
+     * @param prefix 存储路径前缀（如 "avatar"）
      * @return MinIO 对象 Key
      */
     public String uploadFile(MultipartFile file, String prefix) {
@@ -81,26 +81,6 @@ public class FileStorageService {
             throw new BusinessException(ErrorCodeEnum.STORAGE_UPLOAD_FAILED,
                     "文件上传失败: " + e.getMessage());
         }
-    }
-
-    /**
-     * 上传简历文件（存储到 resumes/ 目录）
-     *
-     * @param file 简历 MultipartFile
-     * @return MinIO 对象 Key
-     */
-    public String uploadResume(MultipartFile file) {
-        return uploadFile(file, "resumes");
-    }
-
-    /**
-     * 上传知识库文档（存储到 knowledge/ 目录）
-     *
-     * @param file 知识库文档 MultipartFile
-     * @return MinIO 对象 Key
-     */
-    public String uploadKnowledgeBase(MultipartFile file) {
-        return uploadFile(file, "knowledge");
     }
 
     /**
