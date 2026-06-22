@@ -168,7 +168,7 @@ public class SftpTransferService {
                 }
             }
             long cost = System.currentTimeMillis() - startTime;
-            log.info("文件上传成功 | 本地:{} | 远程:{} | 大小:{} | 耗时:{}ms",
+            log.debug("File uploaded successfully. Local: {} -> Remote: {}, Size: {}, Time: {}ms",
                     localFilePath, absoluteRemotePath,
                     formatFileSize(localFile.length()), cost);
 
@@ -239,7 +239,7 @@ public class SftpTransferService {
             }
 
             long cost = System.currentTimeMillis() - startTime;
-            log.info("文件下载成功 | 远程:{} | 本地:{} | 耗时:{}ms",
+            log.debug("File downloaded successfully. Remote: {} -> Local: {}, Time: {}ms",
                     remoteFilePath, localFilePath, cost);
 
         } catch (Exception e) {
@@ -284,7 +284,7 @@ public class SftpTransferService {
         try {
             channel = poolManager.borrow();
             channel.rm(remoteFilePath);
-            log.info("文件删除成功: {}", remoteFilePath);
+            log.debug("File deleted successfully: {}", remoteFilePath);
 
         } catch (Exception e) {
             if (channel != null) {
@@ -337,7 +337,7 @@ public class SftpTransferService {
                 }
             }
 
-            log.debug("列出目录文件: {}, 共{}个文件", remoteDir, fileNames.size());
+            log.debug("Listed files in directory: {}, total {} files", remoteDir, fileNames.size());
 
         } catch (Exception e) {
             if (channel != null) {
@@ -436,14 +436,14 @@ public class SftpTransferService {
             }
             try {
                 channel.mkdir(remoteDir);
-                log.debug("创建目录成功: {}", remoteDir);
+                log.debug("Remote directory created: {}", remoteDir);
             } catch (SftpException mkdirEx) {
                 // 双重检查：可能在并发时被其他线程创建了
                 try {
                     SftpATTRS attrs = channel.stat(remoteDir);
                     if (!attrs.isDir()) throw mkdirEx;
                 } catch (SftpException ex) {
-                    log.error("SFTP 创建目录失败：{}", remoteDir, mkdirEx);
+                    log.error("Failed to create remote directory: {}.", remoteDir, mkdirEx);
                     throw mkdirEx;
                 }
             }
@@ -454,7 +454,7 @@ public class SftpTransferService {
                 try {
                     channel.cd(currentDir);
                 } catch (Exception e) {
-                    log.warn("恢复工作目录失败，可能连接已断开", e);
+                    log.warn("Failed to restore working directory to {}. Current directory may be changed. Connection might be unstable.", currentDir, e);
                 }
             }
         }
@@ -520,7 +520,7 @@ public class SftpTransferService {
             // 步骤1：借出连接并递归创建目录
             channel = poolManager.borrow();
             ensureRemoteDirExists(channel, remoteDir);
-            log.debug("创建远程目录完成: {}", remoteDir);
+            log.debug("Remote directory created successfully: {}", remoteDir);
         } catch (Exception e) {
             // 步骤2：异常时销毁连接
             if (channel != null) {
@@ -564,7 +564,7 @@ public class SftpTransferService {
             // 步骤1：借出连接并执行重命名
             channel = poolManager.borrow();
             channel.rename(src, dst);
-            log.info("远程重命名成功: {} -> {}", src, dst);
+            log.debug("Remote rename successful: {} -> {}", src, dst);
         } catch (Exception e) {
             // 步骤2：异常时销毁连接
             if (channel != null) {
@@ -606,7 +606,7 @@ public class SftpTransferService {
             // 步骤1：借出连接并执行递归删除
             channel = poolManager.borrow();
             deleteRecursivelyInternal(channel, remotePath);
-            log.info("递归删除成功: {}", remotePath);
+            log.debug("Recursive delete successful: {}", remotePath);
         } catch (Exception e) {
             // 步骤2：异常时销毁连接
             if (channel != null) {
