@@ -6,6 +6,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
@@ -24,15 +25,16 @@ import java.util.List;
  *
  * @author zhao-hao-dong
  */
+@Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class JsonUtils {
     private static ObjectMapper OBJECT_MAPPER;
 
     static {
         OBJECT_MAPPER = JsonMapper.builder()
-                // 1. 空对象不报错
+                // 1. 序列化时，如果对象没有任何属性（空对象），不抛出异常
                 .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
-                // 2. JSON 中有未知字段不报错
+                // 2. 反序列化时，如果 JSON 中包含 Java 类中不存在的未知字段，不抛出异常
                 .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
                 // 3. 忽略 null 值 (使用新的 changeDefaultPropertyInclusion)
                 .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.NON_NULL))
@@ -60,13 +62,13 @@ public class JsonUtils {
      *
      * @param text JSON格式的字符串
      * @return JsonNode对象
-     * @throws RuntimeException 如果转换过程中发生IO异常，则抛出运行时异常
      */
     public static JsonNode parseTree(String text) {
         try {
             return OBJECT_MAPPER.readTree(text);
         } catch (JacksonException e) {
-            throw new RuntimeException(e);
+            log.error("Error parsing object to JsonNode: {}", e.getMessage(), e);
+            return null;
         }
     }
 
@@ -75,13 +77,13 @@ public class JsonUtils {
      *
      * @param text JSON格式的数组
      * @return JsonNode对象
-     * @throws RuntimeException 如果转换过程中发生IO异常，则抛出运行时异常
      */
     public static JsonNode parseTree(byte[] text) {
         try {
             return OBJECT_MAPPER.readTree(text);
         } catch (JacksonException e) {
-            throw new RuntimeException(e);
+            log.error("Error parsing object to JsonNode: {}", e.getMessage(), e);
+            return null;
         }
     }
 
@@ -90,16 +92,16 @@ public class JsonUtils {
      *
      * @param object 要转换的对象
      * @return JSON格式的字符串，如果对象为null，则返回null
-     * @throws RuntimeException 如果转换过程中发生JSON处理异常，则抛出运行时异常
      */
     public static String toJsonString(Object object) {
-        if (ObjectUtil.isNull(object)) {
+        if (object == null) {
             return null;
         }
         try {
             return OBJECT_MAPPER.writeValueAsString(object);
         } catch (JacksonException e) {
-            throw new RuntimeException(e);
+            log.error("Error converting object to JSON: {}", e.getMessage(), e);
+            return null;
         }
     }
 
@@ -110,7 +112,6 @@ public class JsonUtils {
      * @param clazz 要转换的目标对象类型
      * @param <T>   目标对象的泛型类型
      * @return 转换后的对象，如果字符串为空则返回null
-     * @throws RuntimeException 如果转换过程中发生IO异常，则抛出运行时异常
      */
     public static <T> T parseObject(String text, Class<T> clazz) {
         if (StringUtils.isEmpty(text)) {
@@ -119,7 +120,8 @@ public class JsonUtils {
         try {
             return OBJECT_MAPPER.readValue(text, clazz);
         } catch (JacksonException e) {
-            throw new RuntimeException(e);
+            log.error("Error parsing JSON to class {}: {}", clazz.getName(), e.getMessage(), e);
+            return null;
         }
     }
 
@@ -130,7 +132,6 @@ public class JsonUtils {
      * @param clazz 要转换的目标对象类型
      * @param <T>   目标对象的泛型类型
      * @return 转换后的对象，如果字节数组为空则返回null
-     * @throws RuntimeException 如果转换过程中发生IO异常，则抛出运行时异常
      */
     public static <T> T parseObject(byte[] bytes, Class<T> clazz) {
         if (ArrayUtil.isEmpty(bytes)) {
@@ -139,7 +140,8 @@ public class JsonUtils {
         try {
             return OBJECT_MAPPER.readValue(bytes, clazz);
         } catch (JacksonException e) {
-            throw new RuntimeException(e);
+            log.error("Error parsing JSON to class {}: {}", clazz.getName(), e.getMessage(), e);
+            return null;
         }
     }
 
@@ -150,7 +152,6 @@ public class JsonUtils {
      * @param typeReference 指定类型的TypeReference对象
      * @param <T>           目标对象的泛型类型
      * @return 转换后的对象，如果字符串为空则返回null
-     * @throws RuntimeException 如果转换过程中发生IO异常，则抛出运行时异常
      */
     public static <T> T parseObject(String text, TypeReference<T> typeReference) {
         if (StringUtils.isBlank(text)) {
@@ -159,7 +160,8 @@ public class JsonUtils {
         try {
             return OBJECT_MAPPER.readValue(text, typeReference);
         } catch (JacksonException e) {
-            throw new RuntimeException(e);
+            log.error("Error parsing JSON to TypeReference: {}", e.getMessage(), e);
+            return null;
         }
     }
 
@@ -176,11 +178,9 @@ public class JsonUtils {
         }
         try {
             return OBJECT_MAPPER.readValue(text, OBJECT_MAPPER.getTypeFactory().constructType(Dict.class));
-        } catch (MismatchedInputException e) {
-            // 类型不匹配说明不是json
-            return null;
         } catch (JacksonException e) {
-            throw new RuntimeException(e);
+            log.error("Error parsing JSON to Dict: {}", e.getMessage(), e);
+            return null;
         }
     }
 
@@ -198,7 +198,8 @@ public class JsonUtils {
         try {
             return OBJECT_MAPPER.readValue(text, OBJECT_MAPPER.getTypeFactory().constructCollectionType(List.class, Dict.class));
         } catch (JacksonException e) {
-            throw new RuntimeException(e);
+            log.error("Error parsing JSON to List<Dict>: {}", e.getMessage(), e);
+            return null;
         }
     }
 
@@ -218,7 +219,8 @@ public class JsonUtils {
         try {
             return OBJECT_MAPPER.readValue(text, OBJECT_MAPPER.getTypeFactory().constructCollectionType(List.class, clazz));
         } catch (JacksonException e) {
-            throw new RuntimeException(e);
+            log.error("Error parsing JSON to class {}: {}", clazz.getName(), e.getMessage(), e);
+            return null;
         }
     }
 

@@ -1,5 +1,8 @@
 package com.mhd.boot.common.enums;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -10,9 +13,8 @@ import java.util.stream.Collectors;
  *
  * @author zhao-hao-dong
  */
-public class EnumUtil {
-    private EnumUtil() {
-    }
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class EnumUtil {
 
     public static <T extends PowerfulEnum> String getDescriptionByCode(Integer code, Class<T> enumClass) {
         return Arrays.stream(enumClass.getEnumConstants())
