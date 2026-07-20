@@ -1,0 +1,2 @@
+com.mhd.boot.common.redis.config.CacheConfig
+com.mhd.boot.common.redis.config.RedisConfig

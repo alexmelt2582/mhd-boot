@@ -22,6 +22,8 @@
         <module>boot-common-job</module>
         <module>boot-common-operatelog</module>
         <module>boot-common-idempotent</module>
+        <module>boot-common-redis</module>
+        <module>boot-common-sse</module>
     </modules>
 
 </project>

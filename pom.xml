@@ -14,6 +14,7 @@
     <modules>
         <module>libs</module>
         <module>apps</module>
+        <module>modules</module>
     </modules>
 
     <properties>
@@ -43,6 +44,11 @@
         <druid.version>1.2.27</druid.version>
         <mybatis-plus.version>3.5.14</mybatis-plus.version>
         <postgresql.version>42.7.10</postgresql.version>
+
+        <!-- redis -->
+        <redisson.version>3.51.0</redisson.version>
+        <lock4j.version>2.2.7</lock4j.version>
+
 
         <!-- AI相关版本 -->
         <!--<spring-ai.version>1.1.4</spring-ai.version>-->
@@ -90,7 +96,6 @@
         <itext.version>8.0.4</itext.version>
         <minio.version>8.5.9</minio.version>
         <dashscope.version>2.16.6</dashscope.version>
-        <redisson.version>3.51.0</redisson.version>
     </properties>
 
     <dependencyManagement>
@@ -118,6 +123,16 @@
             <dependency>
                 <groupId>com.mhd</groupId>
                 <artifactId>boot-ai</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.mhd</groupId>
+                <artifactId>boot-common-redis</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.mhd</groupId>
+                <artifactId>boot-common-sse</artifactId>
                 <version>${revision}</version>
             </dependency>
 
@@ -231,6 +246,18 @@
                 <groupId>org.postgresql</groupId>
                 <artifactId>postgresql</artifactId>
                 <version>${postgresql.version}</version>
+            </dependency>
+
+            <!-- redis -->
+            <dependency>
+                <groupId>org.redisson</groupId>
+                <artifactId>redisson-spring-boot-starter</artifactId>
+                <version>${redisson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>lock4j-redisson-spring-boot-starter</artifactId>
+                <version>${lock4j.version}</version>
             </dependency>
 
             <!-- 工具类相关 -->
@@ -458,12 +485,6 @@
                 <groupId>com.alibaba</groupId>
                 <artifactId>dashscope-sdk-java</artifactId>
                 <version>${dashscope.version}</version>
-            </dependency>
-            <!-- 分布式工具：Redisson -->
-            <dependency>
-                <groupId>org.redisson</groupId>
-                <artifactId>redisson-spring-boot-starter</artifactId>
-                <version>${redisson.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -10,15 +10,16 @@
   scan: 当此属性设置为true时，配置文件如果发生改变，将会被重新加载，默认值为false
   scanPeriod: 设置监测配置文件是否有修改的时间间隔，如果没有给出时间单位，默认单位是毫秒。当scan为true时，此属性生效。默认的时间间隔为10秒
 -->
-<configuration debug="false" scan="false" scanPeriod="10 seconds">
+<configuration debug="false" scan="true" scanPeriod="10 seconds">
 
     <!-- 从 Spring 环境读取日志目录，避免在 XML 中写死具体应用路径。 -->
+    <springProperty scope="context" name="application_name" source="spring.application.name" defaultValue="boot"/>
     <springProperty scope="context" name="log.path" source="logging.file.path" defaultValue="./logs"/>
     <property name="console.log.pattern"
               value="%cyan(%d{yyyy-MM-dd HH:mm:ss}) %green([%thread]) %highlight(%-5level) %boldMagenta(%logger{36}%n) - %msg%n"/>
     <property name="log.pattern" value="%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"/>
 
-    <!-- 控制台输出，用于开发环境快速观察启动和请求日志。 -->
+    <!-- 控制台输出 -->
     <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>${console.log.pattern}</pattern>
@@ -26,29 +27,13 @@
         </encoder>
     </appender>
 
-    <!-- 控制台日志文件，用于保留标准输出副本，便于容器外本地排查。 -->
-    <appender name="file_console" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${log.path}/sys-console.log</file>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${log.path}/sys-console.%d{yyyy-MM-dd}.log</fileNamePattern>
-            <maxHistory>1</maxHistory>
-        </rollingPolicy>
-        <encoder>
-            <pattern>${log.pattern}</pattern>
-            <charset>UTF-8</charset>
-        </encoder>
-        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>INFO</level>
-        </filter>
-    </appender>
-
-    <!-- INFO 日志：保留业务执行轨迹和常规运行信息。 -->
+    <!-- INFO 日志 -->
     <appender name="file_info" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${log.path}/sys-info.log</file>
+        <file>${log.path}/${application_name}-info.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>${log.path}/sys-info.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <fileNamePattern>${log.path}/${application_name}-info.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
             <maxFileSize>100MB</maxFileSize>
-            <maxHistory>60</maxHistory>
+            <maxHistory>7</maxHistory>
         </rollingPolicy>
         <encoder>
             <pattern>${log.pattern}</pattern>
@@ -61,11 +46,11 @@
         </filter>
     </appender>
 
-    <!-- WARN 日志：重点记录退化、兜底和潜在异常。 -->
+    <!-- WARN 日志 -->
     <appender name="file_warn" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${log.path}/sys-warn.log</file>
+        <file>${log.path}/${application_name}-warn.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>${log.path}/sys-warn.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <fileNamePattern>${log.path}/${application_name}-warn.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
             <maxFileSize>100MB</maxFileSize>
             <maxHistory>60</maxHistory>
         </rollingPolicy>
@@ -80,11 +65,11 @@
         </filter>
     </appender>
 
-    <!-- ERROR 日志：重点用于失败排查、告警和补偿分析。 -->
+    <!-- ERROR 日志 -->
     <appender name="file_error" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${log.path}/sys-error.log</file>
+        <file>${log.path}/${application_name}-error.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>${log.path}/sys-error.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <fileNamePattern>${log.path}/${application_name}-error.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
             <maxFileSize>100MB</maxFileSize>
             <maxHistory>60</maxHistory>
         </rollingPolicy>
@@ -126,6 +111,5 @@
         <appender-ref ref="async_info"/>
         <appender-ref ref="async_warn"/>
         <appender-ref ref="async_error"/>
-        <appender-ref ref="file_console"/>
     </root>
 </configuration>
