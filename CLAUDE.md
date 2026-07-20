@@ -154,8 +154,9 @@ The dev profile (`application-dev.yml`) expects these on their default local por
 
 ## Important Notes
 
-- **Doc/code mismatch**: `docs/DEVELOPMENT_GUIDELINES_MHD_BOOT.md` references Spring Boot 4.x, Java 21, and Spring Data JPA. The actual codebase uses Spring Boot 3.5.9, Java 17, and MyBatis-Plus. Follow the code, not the aspirational docs.
 - **Tests are skipped by default** (`maven-surefire-plugin` has `<skip>true</skip>` in the root POM). Use `-DskipTests=false` to run them.
 - **Jackson version split**: The project uses Jackson 3.1.3 (core via Spring Boot 3) but Jackson 2.21 annotations. Avoid introducing additional Jackson 2.x core dependencies.
 - **Aliyun Maven mirror**: The root POM is configured to use `maven.aliyun.com` as the repository — builds may fail from networks that cannot reach it.
 - **No CI/CD configured**: No GitHub Actions workflows or Jenkinsfiles exist yet.
+- The `front-end/` directory is empty and planned for Vue3 + TypeScript + Vite + TailwindCSS 4.
+
