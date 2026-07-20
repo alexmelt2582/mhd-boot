@@ -9,5 +9,10 @@
         <version>${revision}</version>
     </parent>
 
+    <packaging>pom</packaging>
     <artifactId>modules</artifactId>
+
+    <modules>
+        <module>boot-system</module>
+    </modules>
 </project>

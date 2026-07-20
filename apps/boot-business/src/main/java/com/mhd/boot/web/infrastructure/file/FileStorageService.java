@@ -78,7 +78,7 @@ public class FileStorageService {
             return fileKey;
         } catch (Exception e) {
             log.error("文件上传失败: prefix={}, error={}", prefix, e.getMessage(), e);
-            throw new BusinessException(ErrorCodeEnum.STORAGE_UPLOAD_FAILED,
+            throw new BusinessException(ErrorCodeEnum.FAIL,
                     "文件上传失败: " + e.getMessage());
         }
     }
@@ -100,7 +100,7 @@ public class FileStorageService {
             log.info("PDF 上传成功: key={}", fileKey);
         } catch (Exception e) {
             log.error("PDF 上传失败: key={}, error={}", fileKey, e.getMessage(), e);
-            throw new BusinessException(ErrorCodeEnum.STORAGE_UPLOAD_FAILED,
+            throw new BusinessException(ErrorCodeEnum.FAIL,
                     "PDF 上传失败: " + e.getMessage());
         }
     }
@@ -121,7 +121,7 @@ public class FileStorageService {
                     .build());
         } catch (Exception e) {
             log.error("生成文件 URL 失败: key={}, error={}", fileKey, e.getMessage(), e);
-            throw new BusinessException(ErrorCodeEnum.STORAGE_DOWNLOAD_FAILED,
+            throw new BusinessException(ErrorCodeEnum.FAIL,
                     "生成文件访问地址失败: " + e.getMessage());
         }
     }
@@ -140,7 +140,7 @@ public class FileStorageService {
                     .build());
         } catch (Exception e) {
             log.error("文件下载失败: key={}, error={}", fileKey, e.getMessage(), e);
-            throw new BusinessException(ErrorCodeEnum.STORAGE_DOWNLOAD_FAILED,
+            throw new BusinessException(ErrorCodeEnum.FAIL,
                     "文件下载失败: " + e.getMessage());
         }
     }
@@ -159,7 +159,7 @@ public class FileStorageService {
             log.info("文件删除成功: key={}", fileKey);
         } catch (Exception e) {
             log.error("文件删除失败: key={}, error={}", fileKey, e.getMessage(), e);
-            throw new BusinessException(ErrorCodeEnum.STORAGE_DELETE_FAILED,
+            throw new BusinessException(ErrorCodeEnum.FAIL,
                     "文件删除失败: " + e.getMessage());
         }
     }

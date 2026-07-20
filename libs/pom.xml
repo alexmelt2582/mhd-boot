@@ -16,7 +16,6 @@
         <module>boot-common-doc</module>
         <module>boot-common-mybatis</module>
         <module>boot-common-web</module>
-        <module>boot-ai</module>
         <module>boot-common-sftp</module>
         <module>boot-common-security</module>
         <module>boot-common-job</module>

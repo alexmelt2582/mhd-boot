@@ -1,7 +1,6 @@
 package com.mhd.boot.common.web.config;
 
 import com.mhd.boot.common.web.handler.GlobalExceptionHandler;
-import com.mhd.boot.common.web.handler.MybatisExceptionHandler;
 import com.mhd.boot.common.web.interceptor.PlusWebInvokeTimeInterceptor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -52,13 +51,5 @@ public class ResourcesConfig implements WebMvcConfigurer {
     @Bean
     public GlobalExceptionHandler globalExceptionHandler() {
         return new GlobalExceptionHandler();
-    }
-
-    /**
-     * Mybatis处理器
-     */
-    @Bean
-    public MybatisExceptionHandler mybatisExceptionHandler() {
-        return new MybatisExceptionHandler();
     }
 }

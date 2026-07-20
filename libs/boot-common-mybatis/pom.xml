@@ -18,12 +18,24 @@
             <groupId>com.mhd</groupId>
             <artifactId>boot-common</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.mhd</groupId>
+            <artifactId>boot-common-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.mhd</groupId>
+            <artifactId>boot-common-web</artifactId>
+        </dependency>
 
+        <!-- dynamic-datasource 多数据源-->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>dynamic-datasource-spring-boot3-starter</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
         </dependency>
-
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-jsqlparser</artifactId>

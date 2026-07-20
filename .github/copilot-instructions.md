@@ -40,3 +40,18 @@ Spring Boot 3 + Java 17 + Spring AI + MyBatis-Plus + MySQL8 + Vue3 项目。写�
 - 统一返回格式：所有接口必须返回 `Result<T>`，禁止直接返回裸实体、List 或 Map。
 - 异常处理：统一由全局异常处理器（`@RestControllerAdvice`）捕获，业务异常使用 `BusinessException`，禁止在 Controller 层随意 try-catch 吞掉异常。
 - 安全红线：禁止硬编码 SQL 或拼接字符串，必须使用参数化查询或 LambdaQueryWrapper，杜绝 SQL 注入。
+
+## 4. 模块文档优先读取规则
+- 在修改 `libs` 下公共模块或 `apps` 业务代码前，优先读取 `docs/ai-module-guides/` 中对应模块文档。
+- 处理 `boot-common-security` 时优先读取 `docs/ai-module-guides/boot-common-security.md`。
+- 处理 `boot-common-redis` 时优先读取 `docs/ai-module-guides/boot-common-redis.md`。
+- 处理 `boot-common-mybatis` 时优先读取 `docs/ai-module-guides/boot-common-mybatis.md`。
+- 处理 `boot-common-web` 时优先读取 `docs/ai-module-guides/boot-common-web.md`。
+- 处理 `boot-common-sse` 时优先读取 `docs/ai-module-guides/boot-common-sse.md`。
+- 处理 `boot-common-sftp` 时优先读取 `docs/ai-module-guides/boot-common-sftp.md`。
+- 处理 `boot-common-idempotent` 时优先读取 `docs/ai-module-guides/boot-common-idempotent.md`。
+- 处理 `boot-common-operatelog` 时优先读取 `docs/ai-module-guides/boot-common-operatelog.md`。
+- 处理 `boot-common-job` 时优先读取 `docs/ai-module-guides/boot-common-job.md`。
+- 处理 `boot-common-doc` 时优先读取 `docs/ai-module-guides/boot-common-doc.md`。
+- 处理基础公共能力时优先读取 `docs/ai-module-guides/boot-common.md`。
+- 若文档与源码不一致，以源码为准，并在完成代码后同步更新文档。
