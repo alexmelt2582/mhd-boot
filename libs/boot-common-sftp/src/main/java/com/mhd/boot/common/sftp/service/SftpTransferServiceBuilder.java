@@ -139,16 +139,17 @@ public class SftpTransferServiceBuilder {
      * @throws IllegalStateException 如果必要参数未设置
      */
     public SftpTransferService build() {
-        // 校验必要参数
-        if (config.getHost() == null || config.getHost().isEmpty()) {
-            throw new IllegalStateException("SFTP主机地址不能为空");
+        // 调用统一配置校验，保证构建前所有参数都合法
+        config.valid();
+
+        // 校验重试参数，避免负数导致不可预期行为
+        if (maxRetries < 0) {
+            throw new IllegalStateException("Invalid SFTP config: maxRetries must be greater than or equal to 0.");
         }
-        if (config.getUsername() == null || config.getUsername().isEmpty()) {
-            throw new IllegalStateException("SFTP用户名不能为空");
+        if (retryIntervalMillis < 0) {
+            throw new IllegalStateException("Invalid SFTP config: retryIntervalMillis must be greater than or equal to 0.");
         }
-        if (config.getPassword() == null || config.getPassword().isEmpty()) {
-            throw new IllegalStateException("SFTP密码不能为空");
-        }
+
         SftpPoolManager poolManager = new SftpPoolManager(config);
         return new SftpTransferService(poolManager, maxRetries, retryIntervalMillis);
     }

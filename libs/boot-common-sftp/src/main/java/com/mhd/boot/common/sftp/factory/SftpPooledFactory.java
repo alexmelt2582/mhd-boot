@@ -29,16 +29,10 @@ public class SftpPooledFactory extends BasePooledObjectFactory<ChannelSftp> {
     private final SftpPoolConfig config;
 
     /**
-     * 认证失败熔断标记
-     * 当用户名密码错误时，避免反复创建连接造成资源浪费
+     * 认证熔断截止时间戳，单位毫秒
+     * 当前时间小于该值时，连接创建会被快速失败
      */
-    private volatile boolean authFailed = false;
-
-    /**
-     * 认证失败熔断时间戳，单位毫秒
-     * 熔断后等待一定时间再尝试重新连接
-     */
-    private volatile long authFailedTimestamp = 0;
+    private volatile long authBlockedUntilTimestamp = 0L;
 
     /**
      * 熔断等待时间，默认5分钟
@@ -64,16 +58,18 @@ public class SftpPooledFactory extends BasePooledObjectFactory<ChannelSftp> {
     @Override
     public ChannelSftp create() throws Exception {
         // 检查认证熔断状态，如果处于熔断期则直接抛出异常，避免重复尝试
-        if (authFailed) {
-            long elapsed = System.currentTimeMillis() - authFailedTimestamp;
-            if (elapsed < AUTH_BREAKER_TIMEOUT) {
-                throw new RuntimeException("SFTP认证已熔断，距离下次尝试还有 "
-                        + (AUTH_BREAKER_TIMEOUT - elapsed) / 1000 + " 秒，请检查用户名密码配置");
-            } else {
-                // 熔断时间已过，重置熔断标记，允许重新尝试
-                authFailed = false;
-                log.info("SFTP认证熔断已解除，准备重新尝试连接");
-            }
+        long now = System.currentTimeMillis();
+        long blockedUntil = authBlockedUntilTimestamp;
+        if (blockedUntil > now) {
+            long waitSeconds = (blockedUntil - now) / 1000;
+                throw new RuntimeException("SFTP authentication circuit breaker is active. "
+                        + "Next attempt available in " + waitSeconds
+                        + " seconds. Please verify username and password configuration.");
+        }
+        if (blockedUntil > 0L) {
+            // 熔断时间已过，重置熔断截止时间，允许重新尝试
+            authBlockedUntilTimestamp = 0L;
+            log.info("SFTP authentication circuit breaker has been reset. Preparing to retry connection.");
         }
 
         JSch jsch = new JSch();
@@ -100,22 +96,21 @@ public class SftpPooledFactory extends BasePooledObjectFactory<ChannelSftp> {
 
             // 步骤5：建立SSH连接
             session.connect();
-            log.debug("SSH Session已建立，连接到 {}@{}:{}",
+                log.debug("SSH session connected: {}@{}:{}",
                     config.getUsername(), config.getHost(), config.getPort());
 
             // 步骤6：打开SFTP通道
             channel = (ChannelSftp) session.openChannel("sftp");
             channel.connect();
-            log.debug("SFTP通道已打开");
+                log.debug("SFTP channel opened.");
 
             return channel;
 
         } catch (JSchException e) {
             // 判断是否为认证失败，如果是则触发熔断机制
             if (e.getMessage() != null && e.getMessage().contains("Auth fail")) {
-                authFailed = true;
-                authFailedTimestamp = System.currentTimeMillis();
-                log.error("SFTP认证失败，已触发熔断机制，将在5分钟后重试");
+                authBlockedUntilTimestamp = System.currentTimeMillis() + AUTH_BREAKER_TIMEOUT;
+                log.error("SFTP authentication failed. Auth circuit breaker enabled for 300 seconds.");
             }
             // 清理已创建的部分资源
             if (channel != null && channel.isConnected()) {
@@ -157,7 +152,7 @@ public class SftpPooledFactory extends BasePooledObjectFactory<ChannelSftp> {
             channel.pwd();
             return true;
         } catch (Exception e) {
-            log.warn("SFTP连接校验失败，连接已失效，将被销毁重建");
+            log.warn("SFTP connection validation failed. Connection will be destroyed and recreated.");
             return false;
         }
     }
@@ -176,10 +171,10 @@ public class SftpPooledFactory extends BasePooledObjectFactory<ChannelSftp> {
             // 步骤1：先关闭SFTP通道
             if (channel.isConnected()) {
                 channel.disconnect();
-                log.debug("SFTP通道已关闭");
+                log.debug("SFTP channel closed.");
             }
         } catch (Exception e) {
-            log.warn("关闭SFTP通道时发生异常", e);
+            log.warn("Failed to close SFTP channel.", e);
         }
 
         try {
@@ -187,10 +182,10 @@ public class SftpPooledFactory extends BasePooledObjectFactory<ChannelSftp> {
             Session session = channel.getSession();
             if (session != null && session.isConnected()) {
                 session.disconnect();
-                log.debug("SSH Session已关闭");
+                log.debug("SSH session closed.");
             }
         } catch (Exception e) {
-            log.warn("关闭SSH Session时发生异常", e);
+            log.warn("Failed to close SSH session.", e);
         }
     }
 
@@ -199,8 +194,7 @@ public class SftpPooledFactory extends BasePooledObjectFactory<ChannelSftp> {
      * 当用户修改了密码配置后，可以调用此方法立即解除熔断
      */
     public void resetAuthBreaker() {
-        this.authFailed = false;
-        this.authFailedTimestamp = 0;
-        log.info("SFTP认证熔断状态已手动重置");
+        this.authBlockedUntilTimestamp = 0L;
+        log.info("SFTP auth circuit breaker reset manually.");
     }
 }

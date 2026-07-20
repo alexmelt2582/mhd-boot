@@ -30,6 +30,16 @@ import java.util.regex.Pattern;
 @Slf4j
 public class SftpTransferService {
     /**
+     * 默认最大重试次数（不含首次尝试）
+     */
+    private static final int DEFAULT_MAX_RETRIES = 2;
+
+    /**
+     * 默认重试间隔（毫秒）
+     */
+    private static final long DEFAULT_RETRY_INTERVAL_MILLIS = 1000L;
+
+    /**
      * SFTP连接池管理器
      */
     private final SftpPoolManager poolManager;
@@ -60,7 +70,7 @@ public class SftpTransferService {
      * @param poolManager 连接池管理器
      */
     public SftpTransferService(SftpPoolManager poolManager) {
-        this(poolManager, 2, 1000L);
+        this(poolManager, DEFAULT_MAX_RETRIES, DEFAULT_RETRY_INTERVAL_MILLIS);
     }
 
     /**
@@ -74,6 +84,23 @@ public class SftpTransferService {
         this.poolManager = poolManager;
         this.maxRetries = Math.max(0, maxRetries);
         this.retryIntervalMillis = Math.max(0L, retryIntervalMillis);
+
+        // 在服务构造阶段统一打印完整参数，包含连接参数和重试参数
+        logStartupConfiguration();
+    }
+
+    /**
+     * 输出服务启动参数摘要
+     * 包含连接池配置、连接参数与重试参数，便于快速确认生效配置
+     */
+    private void logStartupConfiguration() {
+        // 汇总并输出服务级配置，帮助排查线上参数问题
+        log.info("{}\n- maxRetries: {}{}\n- retryIntervalMillis: {}{}",
+                poolManager.getConfigSummary(),
+                maxRetries,
+                maxRetries == DEFAULT_MAX_RETRIES ? " (default)" : " (custom)",
+                retryIntervalMillis,
+                retryIntervalMillis == DEFAULT_RETRY_INTERVAL_MILLIS ? " (default)" : " (custom)");
     }
 
     /**
@@ -88,7 +115,7 @@ public class SftpTransferService {
     public void upload(String localFilePath, String remoteDir, String remoteFileName)
             throws SftpTransferException {
         // 将上传操作交给统一重试执行器
-        executeWithRetry("上传文件 " + localFilePath, () -> {
+        executeWithRetry("upload file " + localFilePath, () -> {
             uploadInternal(localFilePath, remoteDir, remoteFileName, null);
             return null;
         });
@@ -106,7 +133,7 @@ public class SftpTransferService {
     public void upload(String localFilePath, String remoteDir, String remoteFileName,
                        SftpProgressMonitor progressMonitor) throws SftpTransferException {
         // 将带进度回调的上传操作交给统一重试执行器
-        executeWithRetry("上传文件(带进度) " + localFilePath, () -> {
+        executeWithRetry("upload file with progress " + localFilePath, () -> {
             uploadInternal(localFilePath, remoteDir, remoteFileName, progressMonitor);
             return null;
         });
@@ -128,14 +155,14 @@ public class SftpTransferService {
         if (!localFile.exists()) {
             throw new SftpTransferException(
                     SftpTransferException.FILE_NOT_FOUND,
-                    "本地文件不存在: " + localFilePath);
+                    "Local file does not exist: " + localFilePath);
         }
 
         // 步骤2：校验文件大小是否超过限制
         if (localFile.length() > MAX_FILE_SIZE) {
             throw new SftpTransferException(
                     SftpTransferException.FILE_SIZE_EXCEEDED,
-                    "文件大小超过限制: " + localFile.length() + " bytes, 最大允许: " + MAX_FILE_SIZE + " bytes");
+                    "File size exceeds limit: " + localFile.length() + " bytes, max allowed: " + MAX_FILE_SIZE + " bytes");
         }
 
         // 步骤3：如果未指定远程文件名，使用本地文件名
@@ -168,7 +195,7 @@ public class SftpTransferService {
                 }
             }
             long cost = System.currentTimeMillis() - startTime;
-            log.debug("File uploaded successfully. Local: {} -> Remote: {}, Size: {}, Time: {}ms",
+            log.info("File uploaded successfully. Local: {} -> Remote: {}, Size: {}, Time: {}ms",
                     localFilePath, absoluteRemotePath,
                     formatFileSize(localFile.length()), cost);
 
@@ -179,7 +206,7 @@ public class SftpTransferService {
                 channel = null;
             }
             throw SftpTransferException.fromJSchException(
-                    new Exception(e), "上传文件 " + localFilePath + " 到 " + remoteDir);
+                    new Exception(e), "upload file " + localFilePath + " to " + remoteDir);
         } finally {
             // 步骤8：如果连接正常，归还到连接池
             if (channel != null) {
@@ -199,7 +226,7 @@ public class SftpTransferService {
     public void download(String remoteFilePath, String localFilePath)
             throws SftpTransferException {
         // 将下载操作交给统一重试执行器
-        executeWithRetry("下载文件 " + remoteFilePath, () -> {
+        executeWithRetry("download file " + remoteFilePath, () -> {
             downloadInternal(remoteFilePath, localFilePath);
             return null;
         });
@@ -239,7 +266,7 @@ public class SftpTransferService {
             }
 
             long cost = System.currentTimeMillis() - startTime;
-            log.debug("File downloaded successfully. Remote: {} -> Local: {}, Time: {}ms",
+            log.info("File downloaded successfully. Remote: {} -> Local: {}, Time: {}ms",
                     remoteFilePath, localFilePath, cost);
 
         } catch (Exception e) {
@@ -249,7 +276,7 @@ public class SftpTransferService {
                 channel = null;
             }
             throw SftpTransferException.fromJSchException(
-                    new Exception(e), "下载文件 " + remoteFilePath + " 到 " + localFilePath);
+                    new Exception(e), "download file " + remoteFilePath + " to " + localFilePath);
         } finally {
             // 步骤5：正常归还连接
             if (channel != null) {
@@ -266,7 +293,7 @@ public class SftpTransferService {
      */
     public void delete(String remoteFilePath) throws SftpTransferException {
         // 将删除操作交给统一重试执行器
-        executeWithRetry("删除文件 " + remoteFilePath, () -> {
+        executeWithRetry("delete file " + remoteFilePath, () -> {
             deleteInternal(remoteFilePath);
             return null;
         });
@@ -292,7 +319,7 @@ public class SftpTransferService {
                 channel = null;
             }
             throw SftpTransferException.fromJSchException(
-                    new Exception(e), "删除文件 " + remoteFilePath);
+                    new Exception(e), "delete file " + remoteFilePath);
         } finally {
             if (channel != null) {
                 poolManager.returnObject(channel);
@@ -310,7 +337,7 @@ public class SftpTransferService {
     @SuppressWarnings("unchecked")
     public List<String> listFiles(String remoteDir) throws SftpTransferException {
         // 将目录列举交给统一重试执行器
-        return executeWithRetry("列出目录 " + remoteDir, () -> listFilesInternal(remoteDir));
+        return executeWithRetry("list files in directory " + remoteDir, () -> listFilesInternal(remoteDir));
     }
 
     /**
@@ -345,7 +372,7 @@ public class SftpTransferService {
                 channel = null;
             }
             throw SftpTransferException.fromJSchException(
-                    new Exception(e), "列出目录 " + remoteDir);
+                    new Exception(e), "list files in directory " + remoteDir);
         } finally {
             if (channel != null) {
                 poolManager.returnObject(channel);
@@ -364,7 +391,7 @@ public class SftpTransferService {
      */
     public boolean fileExists(String remoteFilePath) throws SftpTransferException {
         // 将存在性检查交给统一重试执行器
-        return executeWithRetry("检查文件是否存在 " + remoteFilePath, () -> fileExistsInternal(remoteFilePath));
+        return executeWithRetry("check file existence " + remoteFilePath, () -> fileExistsInternal(remoteFilePath));
     }
 
     /**
@@ -387,14 +414,14 @@ public class SftpTransferService {
             if (e.id == ChannelSftp.SSH_FX_NO_SUCH_FILE) {
                 return false;
             }
-            throw SftpTransferException.fromJSchException(e, "检查文件是否存在 " + remoteFilePath);
+            throw SftpTransferException.fromJSchException(e, "check file existence " + remoteFilePath);
         } catch (Exception e) {
             if (channel != null) {
                 poolManager.invalidateObject(channel);
                 channel = null;
             }
             throw SftpTransferException.fromJSchException(
-                    new Exception(e), "检查文件是否存在 " + remoteFilePath);
+                    new Exception(e), "check file existence " + remoteFilePath);
         } finally {
             if (channel != null) {
                 poolManager.returnObject(channel);
@@ -422,7 +449,7 @@ public class SftpTransferService {
             if (attrs.isDir()) {
                 return; // 目录存在
             } else {
-                throw new SftpException(ChannelSftp.SSH_FX_FAILURE, "路径存在但不是目录: " + remoteDir);
+                throw new SftpException(ChannelSftp.SSH_FX_FAILURE, "Path exists but is not a directory: " + remoteDir);
             }
         } catch (SftpException e) {
             if (e.id != ChannelSftp.SSH_FX_NO_SUCH_FILE) {
@@ -436,7 +463,7 @@ public class SftpTransferService {
             }
             try {
                 channel.mkdir(remoteDir);
-                log.debug("Remote directory created: {}", remoteDir);
+                log.info("Remote directory created: {}", remoteDir);
             } catch (SftpException mkdirEx) {
                 // 双重检查：可能在并发时被其他线程创建了
                 try {
@@ -502,7 +529,7 @@ public class SftpTransferService {
      */
     public void mkdir(String remoteDir) throws SftpTransferException {
         // 将建目录操作交给统一重试执行器
-        executeWithRetry("创建目录 " + remoteDir, () -> {
+        executeWithRetry("create directory " + remoteDir, () -> {
             mkdirInternal(remoteDir);
             return null;
         });
@@ -527,7 +554,7 @@ public class SftpTransferService {
                 poolManager.invalidateObject(channel);
                 channel = null;
             }
-            throw SftpTransferException.fromJSchException(new Exception(e), "创建目录 " + remoteDir);
+            throw SftpTransferException.fromJSchException(new Exception(e), "create directory " + remoteDir);
         } finally {
             // 步骤3：正常归还连接
             if (channel != null) {
@@ -545,7 +572,7 @@ public class SftpTransferService {
      */
     public void rename(String src, String dst) throws SftpTransferException {
         // 将重命名操作交给统一重试执行器
-        executeWithRetry("重命名 " + src + " 到 " + dst, () -> {
+        executeWithRetry("rename " + src + " to " + dst, () -> {
             renameInternal(src, dst);
             return null;
         });
@@ -571,7 +598,7 @@ public class SftpTransferService {
                 poolManager.invalidateObject(channel);
                 channel = null;
             }
-            throw SftpTransferException.fromJSchException(new Exception(e), "重命名 " + src + " 到 " + dst);
+            throw SftpTransferException.fromJSchException(new Exception(e), "rename " + src + " to " + dst);
         } finally {
             // 步骤3：正常归还连接
             if (channel != null) {
@@ -588,7 +615,7 @@ public class SftpTransferService {
      */
     public void deleteRecursively(String remotePath) throws SftpTransferException {
         // 将递归删除操作交给统一重试执行器
-        executeWithRetry("递归删除 " + remotePath, () -> {
+        executeWithRetry("delete recursively " + remotePath, () -> {
             deleteRecursivelyInternalEntry(remotePath);
             return null;
         });
@@ -613,7 +640,7 @@ public class SftpTransferService {
                 poolManager.invalidateObject(channel);
                 channel = null;
             }
-            throw SftpTransferException.fromJSchException(new Exception(e), "递归删除 " + remotePath);
+            throw SftpTransferException.fromJSchException(new Exception(e), "delete recursively " + remotePath);
         } finally {
             // 步骤3：正常归还连接
             if (channel != null) {
@@ -637,7 +664,7 @@ public class SftpTransferService {
     public List<ChannelSftp.LsEntry> listFiles(String remoteDir, String suffix, String reg, int startTime, int endTime)
             throws SftpTransferException {
         // 将筛选列举操作交给统一重试执行器
-        return executeWithRetry("筛选目录文件 " + remoteDir,
+        return executeWithRetry("list filtered files in directory " + remoteDir,
                 () -> listFilesInternal(remoteDir, suffix, reg, startTime, endTime));
     }
 
@@ -700,7 +727,7 @@ public class SftpTransferService {
                 poolManager.invalidateObject(channel);
                 channel = null;
             }
-            throw SftpTransferException.fromJSchException(new Exception(e), "筛选目录文件 " + remoteDir);
+            throw SftpTransferException.fromJSchException(new Exception(e), "list filtered files in directory " + remoteDir);
         } finally {
             // 步骤5：正常归还连接
             if (channel != null) {
@@ -734,14 +761,14 @@ public class SftpTransferService {
                 if (attempt >= totalAttempts || !isRetryableException(e)) {
                     throw e;
                 }
-                log.warn("{}失败，准备第{}/{}次重试，错误码={}，原因={} ",
+                log.warn("{} failed, retry {}/{} will start. errorCode={}, reason={}",
                         operationDesc, attempt, totalAttempts - 1, e.getErrorCode(), e.getMessage());
                 sleepBeforeRetry(operationDesc);
             }
         }
 
         throw lastException == null
-                ? new SftpTransferException(SftpTransferException.TRANSFER_FAILED, operationDesc + "失败")
+                ? new SftpTransferException(SftpTransferException.TRANSFER_FAILED, operationDesc + " failed")
                 : lastException;
     }
 
@@ -794,7 +821,7 @@ public class SftpTransferService {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new SftpTransferException(SftpTransferException.TRANSFER_FAILED,
-                    operationDesc + "重试等待被中断", e);
+                    operationDesc + " retry wait interrupted", e);
         }
     }
 
@@ -862,11 +889,10 @@ public class SftpTransferService {
                 // 是文件，直接删除
                 channel.rm(remotePath);
             }
-            channel.rm(remotePath);
         } catch (SftpException e) {
             // 异常兜底：如果是“文件不存在”，视为删除成功（保证幂等性）
             if (e.id == ChannelSftp.SSH_FX_NO_SUCH_FILE) {
-                log.debug("要删除的路径不存在，视为已删除: {}", remotePath);
+                log.debug("Target path does not exist and is treated as already deleted: {}", remotePath);
                 return;
             }
             // 其他异常（如权限不足、网络中断）继续向上抛出，交由外层统一处理

@@ -110,7 +110,7 @@ public class SftpTransferException extends Exception {
             errorCode = TRANSFER_FAILED;
         }
 
-        return new SftpTransferException(errorCode, context + "失败: " + message, e);
+        return new SftpTransferException(errorCode, context + " failed: " + message, e);
     }
 
     @Override

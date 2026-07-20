@@ -42,6 +42,7 @@ public class SftpPoolManager {
      */
     public SftpPoolManager(SftpPoolConfig config) {
         this.config = config;
+        this.config.valid();
         this.factory = new SftpPooledFactory(config);
 
         // 创建连接池配置对象
@@ -66,10 +67,6 @@ public class SftpPoolManager {
 
         // 创建连接池实例
         this.pool = new GenericObjectPool<>(factory, poolConfig);
-
-        log.info("SFTP连接池已初始化，配置：maxTotal={}, maxIdle={}, minIdle={}, host={}:{}",
-                config.getMaxTotal(), config.getMaxIdle(), config.getMinIdle(),
-                config.getHost(), config.getPort());
     }
 
     /**
@@ -84,14 +81,14 @@ public class SftpPoolManager {
     public ChannelSftp borrow() throws Exception {
         try {
             ChannelSftp channel = pool.borrowObject();
-            log.debug("从连接池借出SFTP连接，当前池状态：活跃={}, 空闲={}", pool.getNumActive(), pool.getNumIdle());
+            log.debug("Borrowed SFTP connection from pool. active={}, idle={}", pool.getNumActive(), pool.getNumIdle());
             return channel;
         } catch (java.util.NoSuchElementException e) {
             // 这种情况通常是池子耗尽且超时了
-            log.error("获取SFTP连接超时，当前池状态：活跃={}, 最大连接数={}", pool.getNumActive(), config.getMaxTotal());
+            log.error("Timed out while borrowing SFTP connection. active={}, maxTotal={}", pool.getNumActive(), config.getMaxTotal());
             throw new RuntimeException(new SftpTransferException(
                     SftpTransferException.POOL_EXHAUSTED,
-                    "SFTP连接池已满，无法获取连接，请稍后重试",
+                    "SFTP connection pool is exhausted. Please retry later.",
                     e
             ));
         }
@@ -106,7 +103,7 @@ public class SftpPoolManager {
     public void returnObject(ChannelSftp channel) {
         if (channel != null) {
             pool.returnObject(channel);
-            log.debug("SFTP连接已归还到连接池，当前池状态：活跃={}, 空闲={}",
+            log.debug("Returned SFTP connection to pool. active={}, idle={}",
                     pool.getNumActive(), pool.getNumIdle());
         }
     }
@@ -122,9 +119,9 @@ public class SftpPoolManager {
         if (channel != null) {
             try {
                 pool.invalidateObject(channel);
-                log.info("SFTP连接已标记为无效并销毁");
+                log.info("Invalidated and destroyed broken SFTP connection.");
             } catch (Exception e) {
-                log.warn("废弃SFTP连接时发生异常", e);
+                log.warn("Failed to invalidate SFTP connection.", e);
             }
         }
     }
@@ -136,11 +133,22 @@ public class SftpPoolManager {
      * @return 连接池状态字符串
      */
     public String getPoolStatus() {
-        return String.format("活跃连接数: %d, 空闲连接数: %d, 总创建数: %d, 总销毁数: %d",
+        return String.format("active=%d, idle=%d, created=%d, destroyed=%d",
                 pool.getNumActive(),
                 pool.getNumIdle(),
                 pool.getCreatedCount(),
                 pool.getDestroyedCount());
+    }
+
+    /**
+     * 获取SFTP配置摘要
+     * 用于由上层服务统一输出启动参数日志
+     *
+     * @return 配置摘要字符串
+     */
+    public String getConfigSummary() {
+        // 返回配置摘要，避免上层直接依赖底层配置对象
+        return config.buildStartupConfigSummary();
     }
 
     /**
@@ -156,9 +164,9 @@ public class SftpPoolManager {
      * 在应用关闭时调用，确保所有连接都被正确关闭
      */
     public void close() {
-        log.info("正在关闭SFTP连接池...");
+        log.info("Closing SFTP connection pool.");
         pool.close();
-        log.info("SFTP连接池已关闭");
+        log.info("SFTP connection pool closed.");
     }
 
 }
