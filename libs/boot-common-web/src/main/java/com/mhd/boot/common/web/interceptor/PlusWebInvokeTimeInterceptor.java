@@ -46,6 +46,7 @@ public class PlusWebInvokeTimeInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String url = request.getMethod() + " " + request.getRequestURI();
+
         // 1. 按请求类型打印参数，便于接口问题排查。
         if (isJsonRequest(request)) {
             String jsonParam = "";

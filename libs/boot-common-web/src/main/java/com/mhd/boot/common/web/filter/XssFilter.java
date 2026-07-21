@@ -1,8 +1,8 @@
 package com.mhd.boot.common.web.filter;
 
 import com.mhd.boot.common.utils.StringUtils;
-import com.mhd.boot.common.web.properties.XssProperties;
-import com.mhd.boot.common.web.utils.SpringUtils;
+import com.mhd.boot.common.web.config.properties.XssProperties;
+import com.mhd.boot.common.utils.SpringUtils;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

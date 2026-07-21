@@ -2,7 +2,7 @@ package com.mhd.boot.common.web.config;
 
 import com.mhd.boot.common.web.filter.RepeatableFilter;
 import com.mhd.boot.common.web.filter.XssFilter;
-import com.mhd.boot.common.web.properties.XssProperties;
+import com.mhd.boot.common.web.config.properties.XssProperties;
 import jakarta.servlet.DispatcherType;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

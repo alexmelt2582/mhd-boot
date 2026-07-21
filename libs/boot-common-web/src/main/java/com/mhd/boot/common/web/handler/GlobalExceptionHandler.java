@@ -1,13 +1,20 @@
 package com.mhd.boot.common.web.handler;
 
+import cn.hutool.http.HttpStatus;
 import com.mhd.boot.common.enums.ErrorCodeEnum;
 import com.mhd.boot.common.exception.BusinessException;
 import com.mhd.boot.common.respnsedata.BaseResponse;
 import com.mhd.boot.common.respnsedata.BaseResultUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MissingPathVariableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.NoHandlerFoundException;
+import tools.jackson.databind.exc.InvalidFormatException;
 
 /**
  * 全局异常处理器
@@ -76,63 +83,80 @@ public class GlobalExceptionHandler {
     //    return BaseResultUtils.error(ErrorCodeEnum.BAD_REQUEST, String.format("请求参数缺失:%s", ex.getParameterName()));
     //}
     //
-    ///**
-    // * 处理SpringMVC请求参数类型错误异常
-    // *
-    // * @param ex 参数类型不匹配异常
-    // * @return 统一响应结果
-    // */
-    //@ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    //public BaseResponse<?> methodArgumentTypeMismatchExceptionHandler(HttpServletRequest request, MethodArgumentTypeMismatchException ex) {
-    //    String requestContext = buildRequestContext(request);
-    //    log.warn("[ArgumentTypeMismatch] {} [ParamName:{}] [ExpectedType:{}] [ActualValue:{}]",
-    //            requestContext, ex.getName(),
-    //            ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "unknown",
-    //            ex.getValue(), ex);
-    //    return BaseResultUtils.error(ErrorCodeEnum.BAD_REQUEST, String.format("请求参数类型错误:%s", ex.getMessage()));
-    //}
-    //
-    ///**
-    // * 处理请求体读取异常（JSON格式错误、类型转换失败、请求参数格式非法、字段类型不匹配等）
-    // *
-    // * @param ex 请求体读取异常
-    // * @return 统一响应结果
-    // */
-    //@ExceptionHandler(HttpMessageNotReadableException.class)
-    //public BaseResponse<?> methodArgumentTypeInvalidFormatExceptionHandler(HttpServletRequest request, HttpMessageNotReadableException ex) {
-    //    log.error("请求地址'{}', 参数解析失败: {}", request.getRequestURI(), e.getMessage());
-    //    return R.fail(HttpStatus.HTTP_BAD_REQUEST, "请求参数格式错误：" + e.getMostSpecificCause().getMessage());
-    //    String requestContext = buildRequestContext(request);
-    //    String exceptionInfo = buildExceptionStackTrace(ex);
-    //    if (ex.getCause() instanceof InvalidFormatException) {
-    //        InvalidFormatException invalidFormatException = (InvalidFormatException) ex.getCause();
-    //        log.warn("[JsonFormatException] {} {} [InvalidValue:{}] [TargetType:{}]",
-    //                requestContext, exceptionInfo, invalidFormatException.getValue(),
-    //                invalidFormatException.getTargetType().getSimpleName(), ex);
-    //        return BaseResultUtils.error(ErrorCodeEnum.BAD_REQUEST,
-    //                String.format("请求参数类型错误:%s", invalidFormatException.getValue()));
-    //    } else {
-    //        log.warn("[HttpMessageNotReadable] {} {}", requestContext, exceptionInfo, ex);
-    //        return defaultExceptionHandler(request, ex);
-    //    }
-    //}
-    //
-    ///**
-    // * 处理HTTP请求方法不支持异常
-    // *
-    // * @param ex HTTP请求方法不支持异常
-    // * @return 统一响应结果
-    // */
-    //@ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    //public BaseResponse<?> httpRequestMethodNotSupportedExceptionHandler(HttpRequestMethodNotSupportedException ex) {
-    //    HttpServletRequest request = ServletUtils.getRequest();
-    //    String requestContext = buildRequestContext(request);
-    //    String exceptionInfo = buildExceptionStackTrace(ex);
-    //    log.warn("[HttpMethodNotSupported] {} {} [CurrentMethod:{}] [SupportedMethods:{}]",
-    //            requestContext, exceptionInfo, ex.getMethod(),
-    //            ex.getSupportedMethods() != null ? String.join(",", ex.getSupportedMethods()) : "unknown", ex);
-    //    return BaseResultUtils.error(ErrorCodeEnum.METHOD_NOT_ALLOWED, String.format("请求方法不正确:%s", ex.getMessage()));
-    //}
+
+    /**
+     * 请求方式不支持，返回 405
+     *
+     * @param ex HTTP请求方法不支持异常
+     * @return 统一响应结果
+     */
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public BaseResponse<?> httpRequestMethodNotSupportedExceptionHandler(HttpRequestMethodNotSupportedException ex, HttpServletRequest request) {
+        String requestURI = request.getRequestURI();
+        log.error("请求地址'{}',不支持'{}'请求", requestURI, ex.getMethod());
+        return BaseResultUtils.error(HttpStatus.HTTP_BAD_METHOD, ex.getMessage());
+    }
+
+    /**
+     * 请求路径中缺少必需的路径变量
+     */
+    @ExceptionHandler(MissingPathVariableException.class)
+    public BaseResponse<Void> handleMissingPathVariableException(MissingPathVariableException e, HttpServletRequest request) {
+        String requestURI = request.getRequestURI();
+        log.error("请求路径中缺少必需的路径变量'{}',发生系统异常.", requestURI);
+        return BaseResultUtils.error(String.format("请求路径中缺少必需的路径变量[%s]", e.getVariableName()));
+    }
+
+    /**
+     * 请求参数类型不匹配
+     */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public BaseResponse<Void> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e, HttpServletRequest request) {
+        String requestURI = request.getRequestURI();
+        log.error("请求参数类型不匹配'{}',发生系统异常.", requestURI);
+        return BaseResultUtils.error(String.format("请求参数类型不匹配，参数[%s]要求类型为：'%s'，但输入值为：'%s'", e.getName(), e.getRequiredType().getName(), e.getValue()));
+    }
+
+    /**
+     * 找不到路由
+     */
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public BaseResponse<Void> handleNoHandlerFoundException(NoHandlerFoundException e, HttpServletRequest request) {
+        String requestURI = request.getRequestURI();
+        log.error("请求地址'{}'不存在.", requestURI);
+        return BaseResultUtils.error(HttpStatus.HTTP_NOT_FOUND, e.getMessage());
+    }
+
+    /**
+     * 处理请求体读取异常（JSON格式错误、类型转换失败、请求参数格式非法、字段类型不匹配等）
+     *
+     * @param e 请求体读取异常
+     * @return 统一响应结果
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public BaseResponse<Void> methodArgumentTypeInvalidFormatExceptionHandler(HttpServletRequest request, HttpMessageNotReadableException e) {
+        if (e.getCause() instanceof InvalidFormatException) {
+            InvalidFormatException invalidFormatException = (InvalidFormatException) e.getCause();
+            log.warn("[JsonFormatException] {} {} [InvalidValue:{}] [TargetType:{}]",
+                    requestContext, exceptionInfo, invalidFormatException.getValue(),
+                    invalidFormatException.getTargetType().getSimpleName(), ex);
+        }
+        log.error("请求地址'{}', 参数解析失败: {}", request.getRequestURI(), e.getMessage());
+        return BaseResultUtils.error(HttpStatus.HTTP_BAD_REQUEST, "请求参数格式错误：" + e.getMostSpecificCause().getMessage());
+        String requestContext = buildRequestContext(request);
+        String exceptionInfo = buildExceptionStackTrace(ex);
+        if (ex.getCause() instanceof InvalidFormatException) {
+            InvalidFormatException invalidFormatException = (InvalidFormatException) ex.getCause();
+            log.warn("[JsonFormatException] {} {} [InvalidValue:{}] [TargetType:{}]",
+                    requestContext, exceptionInfo, invalidFormatException.getValue(),
+                    invalidFormatException.getTargetType().getSimpleName(), ex);
+            return BaseResultUtils.error(ErrorCodeEnum.BAD_REQUEST,
+                    String.format("请求参数类型错误:%s", invalidFormatException.getValue()));
+        } else {
+            log.warn("[HttpMessageNotReadable] {} {}", requestContext, exceptionInfo, ex);
+            return defaultExceptionHandler(request, ex);
+        }
+    }
 
     ///**
     // * Validation参数校验异常处理
@@ -211,7 +235,7 @@ public class GlobalExceptionHandler {
         String requestContext = buildRequestContext(req);
         log.error("[SystemException] {} ,发生系统异常",
                 requestContext, ex);
-        return BaseResultUtils.error(ErrorCodeEnum.ERROR_500);
+        return BaseResultUtils.error(ErrorCodeEnum.FAIL);
     }
 
     ///**
