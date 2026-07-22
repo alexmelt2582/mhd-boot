@@ -11,7 +11,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.mhd.boot.common.redis.config.properties.RedissonProperties;
 import com.mhd.boot.common.redis.handler.KeyPrefixHandler;
 import com.mhd.boot.common.redis.handler.RedisExceptionHandler;
-import com.mhd.boot.common.web.utils.SpringUtils;
+import com.mhd.boot.common.utils.SpringUtils;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.client.codec.StringCodec;

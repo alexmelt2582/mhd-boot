@@ -1,6 +1,6 @@
 package com.mhd.boot.common.redis.manager;
 
-import com.mhd.boot.common.web.utils.SpringUtils;
+import com.mhd.boot.common.utils.SpringUtils;
 import org.springframework.cache.Cache;
 
 import java.util.concurrent.Callable;

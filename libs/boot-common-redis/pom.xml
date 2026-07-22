@@ -14,7 +14,7 @@
     <dependencies>
         <dependency>
             <groupId>com.mhd</groupId>
-            <artifactId>boot-common-web</artifactId>
+            <artifactId>boot-common</artifactId>
         </dependency>
         <dependency>
             <groupId>org.redisson</groupId>

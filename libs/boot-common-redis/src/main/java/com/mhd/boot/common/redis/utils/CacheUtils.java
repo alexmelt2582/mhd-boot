@@ -1,6 +1,6 @@
 package com.mhd.boot.common.redis.utils;
 
-import com.mhd.boot.common.web.utils.SpringUtils;
+import com.mhd.boot.common.utils.SpringUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.cache.Cache;
