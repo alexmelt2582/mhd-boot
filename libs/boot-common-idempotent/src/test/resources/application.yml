@@ -2,8 +2,29 @@ spring:
   data:
     redis:
       host: localhost
-      password: BMxddVHuokdFYFKoYsm0ag==
+      password:
       port: 6379
-mhd:
-  idempotent:
-    key-store-type: redis
+      # 连接超时时间
+      timeout: 10s
+      # 是否开启ssl
+      ssl.enabled: false
+
+redisson:
+  # 线程池数量
+  threads: 16
+  # Netty线程池数量
+  nettyThreads: 32
+  # 单节点配置
+  single-server-config:
+    # 客户端名称
+    clientName: "test"
+    # 最小空闲连接数
+    connectionMinimumIdleSize: 32
+    # 连接池大小
+    connectionPoolSize: 64
+    # 连接空闲超时，单位：毫秒
+    idleConnectionTimeout: 10000
+    # 命令等待超时，单位：毫秒
+    timeout: 3000
+    # 发布和订阅连接池大小
+    subscriptionConnectionPoolSize: 50

@@ -1,1 +1,1 @@
-com.mhd.boot.common.idempotent.config.IdempotentAutoConfiguration
+com.mhd.boot.common.idempotent.config.IdempotentConfig

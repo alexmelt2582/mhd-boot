@@ -18,7 +18,7 @@
   - Redis-backed key store using `setIfAbsent`
 - `com.mhd.boot.common.idempotent.core.key.store.MemoryIdempotentKeyStore`
   - In-memory key store for simpler environments
-- `com.mhd.boot.common.idempotent.config.IdempotentAutoConfiguration`
+- `com.mhd.boot.common.idempotent.config.IdempotentConfig`
   - Registers generator, store, and aspect
 
 ## 3. Boundaries and Non-Goals
