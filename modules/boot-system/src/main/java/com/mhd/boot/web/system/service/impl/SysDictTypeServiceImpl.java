@@ -12,7 +12,7 @@ import com.mhd.boot.common.mybatis.core.domain.PageResultUtils;
 import com.mhd.boot.common.mybatis.core.utils.MybatisPlusUtils;
 import com.mhd.boot.common.mybatis.core.wrapper.LambdaQueryWrapperX;
 import com.mhd.boot.common.redis.utils.CacheUtils;
-import com.mhd.boot.common.web.utils.MapstructUtils;
+import com.mhd.boot.common.utils.MapstructUtils;
 import com.mhd.boot.web.system.constant.CacheNames;
 import com.mhd.boot.web.system.entity.SysDictData;
 import com.mhd.boot.web.system.entity.SysDictType;
@@ -41,24 +41,24 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
     private final SysDictDataMapper dictDataMapper;
 
     @Override
-    public PageResponse<SysDictTypeVo> selectPageDictTypeList(SysDictType sysDictType, PageParam pageParam) {
+    public PageResponse<SysDictTypeVo> selectPageDictTypeList(SysDictTypeDTO sysDictTypeDTO, PageParam pageParam) {
         Page<SysDictType> page = MybatisPlusUtils.buildPage(pageParam, null);
-        LambdaQueryWrapperX<SysDictType> wrapperX = buildQueryWrapper(sysDictType);
+        LambdaQueryWrapperX<SysDictType> wrapperX = buildQueryWrapper(sysDictTypeDTO);
         IPage<SysDictTypeVo> voPage = MybatisPlusUtils.selectVoPage(baseMapper, page, wrapperX, SysDictTypeVo.class);
         return PageResultUtils.build(voPage);
     }
 
     @Override
-    public List<SysDictTypeVo> selectPageDictTypeList(SysDictType sysDictType) {
-        LambdaQueryWrapperX<SysDictType> wrapperX = buildQueryWrapper(sysDictType);
+    public List<SysDictTypeVo> selectPageDictTypeList(SysDictTypeDTO sysDictTypeDTO) {
+        LambdaQueryWrapperX<SysDictType> wrapperX = buildQueryWrapper(sysDictTypeDTO);
         List<SysDictType> sysDictTypeList = baseMapper.selectList(wrapperX);
         return MapstructUtils.convert(sysDictTypeList, SysDictTypeVo.class);
     }
 
-    private LambdaQueryWrapperX<SysDictType> buildQueryWrapper(SysDictType sysDictType) {
+    private LambdaQueryWrapperX<SysDictType> buildQueryWrapper(SysDictTypeDTO sysDictTypeDTO) {
         LambdaQueryWrapperX<SysDictType> lqw = new LambdaQueryWrapperX<>();
-        lqw.likeIfPresent(SysDictType::getDictName, sysDictType.getDictName());
-        lqw.likeIfPresent(SysDictType::getDictType, sysDictType.getDictType());
+        lqw.likeIfPresent(SysDictType::getDictName, sysDictTypeDTO.getDictName());
+        lqw.likeIfPresent(SysDictType::getDictType, sysDictTypeDTO.getDictType());
         lqw.orderByAsc(SysDictType::getId);
         return lqw;
     }

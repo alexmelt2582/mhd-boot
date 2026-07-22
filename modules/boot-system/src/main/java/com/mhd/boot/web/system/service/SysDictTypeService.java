@@ -18,19 +18,19 @@ public interface SysDictTypeService {
     /**
      * 分页查询字典类型列表
      *
-     * @param sysDictType 查询条件
+     * @param sysDictTypeDTO 查询条件
      * @param pageParam   分页参数
      * @return 字典类型分页列表
      */
-    PageResponse<SysDictTypeVo> selectPageDictTypeList(SysDictType sysDictType, PageParam pageParam);
+    PageResponse<SysDictTypeVo> selectPageDictTypeList(SysDictTypeDTO sysDictTypeDTO, PageParam pageParam);
 
     /**
      * 根据条件查询字典类型
      *
-     * @param sysDictType 查询条件
+     * @param sysDictTypeDTO 查询条件
      * @return 字典类型列表
      */
-    List<SysDictTypeVo> selectPageDictTypeList(SysDictType sysDictType);
+    List<SysDictTypeVo> selectPageDictTypeList(SysDictTypeDTO sysDictTypeDTO);
 
 
     /**

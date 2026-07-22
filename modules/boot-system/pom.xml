@@ -18,6 +18,10 @@
         </dependency>
         <dependency>
             <groupId>com.mhd</groupId>
+            <artifactId>boot-common-mybatis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.mhd</groupId>
             <artifactId>boot-common-redis</artifactId>
         </dependency>
         <dependency>
