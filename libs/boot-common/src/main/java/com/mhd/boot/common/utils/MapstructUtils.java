@@ -1,4 +1,4 @@
-package com.mhd.boot.common.web.utils;
+package com.mhd.boot.common.utils;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;

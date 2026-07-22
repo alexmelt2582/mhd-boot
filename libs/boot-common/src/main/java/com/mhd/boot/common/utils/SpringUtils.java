@@ -1,4 +1,4 @@
-package com.mhd.boot.common.web.utils;
+package com.mhd.boot.common.utils;
 
 import cn.hutool.extra.spring.SpringUtil;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;

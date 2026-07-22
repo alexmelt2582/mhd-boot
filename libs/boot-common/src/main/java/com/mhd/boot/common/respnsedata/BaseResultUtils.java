@@ -53,14 +53,14 @@ public class BaseResultUtils {
      * 失败-不携带数据
      */
     public static <T> BaseResponse<T> error() {
-        return error(ErrorCodeEnum.ERROR_500);
+        return error(ErrorCodeEnum.FAIL);
     }
 
     /**
      * 失败-不携带数据
      */
-    public static <T> BaseResponse<T> error(String code) {
-        return error(code, null);
+    public static <T> BaseResponse<T> error(String message) {
+        return error(ErrorCodeEnum.FAIL, message);
     }
 
     /**
