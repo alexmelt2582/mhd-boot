@@ -43,7 +43,7 @@ public @interface OperateLog {
     boolean logArgs() default true;
 
     /**
-     * 是否记录方法结果的数据。默认不记录结果
+     * 是否记录方法结果的数据。默认记录结果
      */
     boolean logResultData() default true;
 
