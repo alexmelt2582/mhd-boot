@@ -6,7 +6,7 @@ import cn.hutool.json.JSONUtil;
 import com.mhd.boot.common.redis.utils.RedisUtils;
 import com.mhd.boot.common.sse.dto.SseEventDto;
 import com.mhd.boot.common.sse.dto.SseMessageDto;
-import com.mhd.boot.common.web.utils.SpringUtils;
+import com.mhd.boot.common.utils.SpringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 

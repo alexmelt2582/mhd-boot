@@ -3,7 +3,7 @@ package com.mhd.boot.common.sse.utils;
 import com.mhd.boot.common.sse.core.SseEmitterManager;
 import com.mhd.boot.common.sse.dto.SseEventDto;
 import com.mhd.boot.common.sse.dto.SseMessageDto;
-import com.mhd.boot.common.web.utils.SpringUtils;
+import com.mhd.boot.common.utils.SpringUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
