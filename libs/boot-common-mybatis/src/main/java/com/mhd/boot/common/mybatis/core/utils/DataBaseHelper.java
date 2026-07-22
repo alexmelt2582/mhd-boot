@@ -2,7 +2,7 @@ package com.mhd.boot.common.mybatis.core.utils;
 
 import com.baomidou.dynamic.datasource.DynamicRoutingDataSource;
 import com.mhd.boot.common.mybatis.core.enums.DataBaseType;
-import com.mhd.boot.common.web.utils.SpringUtils;
+import com.mhd.boot.common.utils.SpringUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
