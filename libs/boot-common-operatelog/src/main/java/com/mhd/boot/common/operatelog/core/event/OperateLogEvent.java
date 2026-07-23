@@ -1,22 +1,18 @@
-package com.mhd.boot.common.operatelog.core.vo;
+package com.mhd.boot.common.operatelog.core.event;
 
 import com.mhd.boot.common.operatelog.core.enums.OperateResultEnum;
 import com.mhd.boot.common.operatelog.core.enums.OperateTypeEnum;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.Data;
 
 import java.util.Map;
 
 /**
- * 操作日志 VO 对象
+ * 操作日志 Event 事件对象
  *
  * @author zhao-hao-dong
  **/
-@Getter
-@Setter
-@ToString
-public class OperateLogVO {
+@Data
+public class OperateLogEvent {
     /**
      * 用户ID
      */

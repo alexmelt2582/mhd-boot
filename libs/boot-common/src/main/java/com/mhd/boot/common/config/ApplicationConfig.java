@@ -1,4 +1,4 @@
-package com.mhd.boot.common.web.config;
+package com.mhd.boot.common.config;
 
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;

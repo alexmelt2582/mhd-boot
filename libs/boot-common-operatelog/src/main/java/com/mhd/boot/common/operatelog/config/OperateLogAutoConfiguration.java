@@ -1,15 +1,10 @@
 package com.mhd.boot.common.operatelog.config;
 
 import com.mhd.boot.common.operatelog.core.aspect.OperateLogAspect;
-import com.mhd.boot.common.operatelog.core.service.OperateLogCollectorService;
-import com.mhd.boot.common.operatelog.core.service.OperateLogDefaultCollectorServiceImpl;
-import com.mhd.boot.common.operatelog.core.service.OperateLogDefaultHandlerServiceImpl;
-import com.mhd.boot.common.operatelog.core.service.OperateLogHandlerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 
@@ -47,25 +42,5 @@ public class OperateLogAutoConfiguration {
     @ConditionalOnProperty(prefix = "mhd.operate-log", name = "enable", havingValue = "true", matchIfMissing = true)
     public OperateLogAspect operateLogAspect() {
         return new OperateLogAspect();
-    }
-
-    /**
-     * 当Spring容器中没有 OperateLogCollectorService 时，才会注册 OperateLogCollectorService
-     */
-    @ConditionalOnMissingBean
-    @ConditionalOnProperty(prefix = "mhd.operate-log", name = "enable", havingValue = "true", matchIfMissing = true)
-    @Bean
-    public OperateLogCollectorService operateLogCollectorService() {
-        return new OperateLogDefaultCollectorServiceImpl();
-    }
-
-    /**
-     * 当Spring容器中没有 OperateLogHandlerService 时，才会注册 OperateLogHandlerService
-     */
-    @ConditionalOnMissingBean
-    @ConditionalOnProperty(prefix = "mhd.operate-log", name = "enable", havingValue = "true", matchIfMissing = true)
-    @Bean
-    public OperateLogHandlerService operateLogHandlerService() {
-        return new OperateLogDefaultHandlerServiceImpl();
     }
 }

@@ -1,1 +1,3 @@
 com.mhd.boot.common.utils.SpringUtils
+com.mhd.boot.common.config.ApplicationConfig
+com.mhd.boot.common.config.ThreadPoolConfig

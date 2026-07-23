@@ -81,33 +81,6 @@ public final class IpDomainUtil {
     }
 
     /**
-     * 获取当前IP
-     *
-     * @return ip
-     */
-    public static String getLocalhostIp() {
-        try {
-            Enumeration<NetworkInterface> allNetInterfaces = NetworkInterface.getNetworkInterfaces();
-            InetAddress ip;
-            while (allNetInterfaces.hasMoreElements()) {
-                NetworkInterface netInterface = allNetInterfaces.nextElement();
-                if (!netInterface.isLoopback() && !netInterface.isVirtual() && netInterface.isUp()) {
-                    Enumeration<InetAddress> addresses = netInterface.getInetAddresses();
-                    while (addresses.hasMoreElements()) {
-                        ip = addresses.nextElement();
-                        if (ip instanceof Inet4Address) {
-                            return ip.getHostAddress();
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {
-            log.warn(e.getMessage());
-        }
-        return null;
-    }
-
-    /**
      * 查看IP地址类型
      *
      * @param ipDomain IP地址
