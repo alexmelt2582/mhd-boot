@@ -1,42 +1,37 @@
-package com.mhd.boot.web.system.model.vo;
+package com.mhd.boot.common.web.dto;
 
-import com.mhd.boot.web.system.entity.SysDictType;
-import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Date;
 
 /**
- * 字典类型视图对象
- *
  * @author zhao-hao-dong
  */
 @Data
-@AutoMapper(target = SysDictType.class)
-public class SysDictTypeVo implements Serializable {
+@NoArgsConstructor
+public class DictTypeDTO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
+
     /**
-     * 主键
+     * 字典主键
      */
     private Long dictId;
+
     /**
      * 字典名称
      */
     private String dictName;
+
     /**
      * 字典类型
      */
     private String dictType;
+
     /**
      * 备注
      */
     private String remark;
-    /**
-     * 创建时间
-     */
-    private Date createTime;
-
 }

@@ -2,7 +2,6 @@ spring:
   data:
     redis:
       host: localhost
-      password:
       port: 6379
       # 连接超时时间
       timeout: 10s

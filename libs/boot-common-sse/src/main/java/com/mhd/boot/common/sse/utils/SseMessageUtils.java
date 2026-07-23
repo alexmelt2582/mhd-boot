@@ -26,6 +26,7 @@ public class SseMessageUtils {
         if (isEnable() && MANAGER == null) {
             MANAGER = SpringUtils.getBean(SseEmitterManager.class);
         }
+        log.info("SSE function is enabled: {}", SSE_ENABLE);
     }
 
     /**

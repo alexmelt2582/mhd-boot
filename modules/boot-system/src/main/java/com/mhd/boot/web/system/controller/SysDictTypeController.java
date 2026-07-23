@@ -1,6 +1,7 @@
 package com.mhd.boot.web.system.controller;
 
 import com.baomidou.lock.annotation.Lock4j;
+import com.mhd.boot.common.idempotent.annotation.RepeatSubmit;
 import com.mhd.boot.common.mybatis.core.domain.PageParam;
 import com.mhd.boot.common.mybatis.core.domain.PageResponse;
 import com.mhd.boot.common.operatelog.core.annotation.OperateLog;
@@ -11,7 +12,6 @@ import com.mhd.boot.web.system.model.dto.SysDictTypeDTO;
 import com.mhd.boot.web.system.model.vo.SysDictTypeVo;
 import com.mhd.boot.web.system.service.SysDictTypeService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +19,8 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
+ * 数据字典信息
+ *
  * @author zhao-hao-dong
  **/
 @Validated

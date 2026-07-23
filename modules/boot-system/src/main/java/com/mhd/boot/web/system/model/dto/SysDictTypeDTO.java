@@ -22,9 +22,9 @@ public class SysDictTypeDTO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     /**
-     * 字典主键
+     * 主键
      */
-    private Long id;
+    private Long dictId;
     /**
      * 字典名称
      */

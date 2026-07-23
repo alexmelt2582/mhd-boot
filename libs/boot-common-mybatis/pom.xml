@@ -22,10 +22,6 @@
             <groupId>com.mhd</groupId>
             <artifactId>boot-common-security</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.mhd</groupId>
-            <artifactId>boot-common-web</artifactId>
-        </dependency>
 
         <!-- dynamic-datasource 多数据源-->
         <dependency>

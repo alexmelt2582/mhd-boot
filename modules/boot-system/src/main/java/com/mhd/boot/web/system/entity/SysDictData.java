@@ -19,8 +19,8 @@ public class SysDictData extends BaseEntity {
     /**
      * 字典编码
      */
-    @TableId(value = "id")
-    private Long id;
+    @TableId(value = "dict_code")
+    private Long dictCode;
     /**
      * 字典排序
      */

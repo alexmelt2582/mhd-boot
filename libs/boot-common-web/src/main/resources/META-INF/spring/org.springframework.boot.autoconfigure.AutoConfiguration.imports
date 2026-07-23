@@ -1,3 +1,4 @@
 com.mhd.boot.common.web.config.FilterConfig
 com.mhd.boot.common.web.config.ResourcesConfig
 com.mhd.boot.common.web.config.UndertowConfig
+com.mhd.boot.common.web.config.ApplicationConfig

@@ -19,7 +19,7 @@ public class SysDictDataVo implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     /**
-     * 字典编码
+     * 主键
      */
     private Long dictCode;
     /**

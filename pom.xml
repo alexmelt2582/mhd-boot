@@ -153,6 +153,12 @@
                 <version>${revision}</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.mhd</groupId>
+                <artifactId>boot-system</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
             <!-- Spring Boot BOM -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>

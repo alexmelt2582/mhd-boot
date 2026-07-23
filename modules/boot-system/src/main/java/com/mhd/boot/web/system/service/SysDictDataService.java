@@ -3,6 +3,7 @@ package com.mhd.boot.web.system.service;
 import com.mhd.boot.common.mybatis.core.domain.PageParam;
 import com.mhd.boot.common.mybatis.core.domain.PageResponse;
 import com.mhd.boot.web.system.entity.SysDictData;
+import com.mhd.boot.web.system.model.dto.SysDictDataDTO;
 import com.mhd.boot.web.system.model.vo.SysDictDataVo;
 
 import java.util.List;
@@ -16,19 +17,19 @@ public interface SysDictDataService {
     /**
      * 分页查询字典数据列表
      *
-     * @param sysDictData  查询条件
+     * @param dto  查询条件
      * @param pageParam 分页参数
      * @return 字典数据分页列表
      */
-    PageResponse<SysDictDataVo> selectPageDictDataList(SysDictData sysDictData, PageParam pageParam);
+    PageResponse<SysDictDataVo> selectPageDictDataList(SysDictDataDTO dto, PageParam pageParam);
 
     /**
-     * 根据条件分页查询字典数据
+     * 根据条件查询字典数据
      *
-     * @param sysDictData 字典数据信息
+     * @param dto 字典数据信息
      * @return 字典数据集合信息
      */
-    List<SysDictDataVo> selectDictDataList(SysDictData sysDictData);
+    List<SysDictDataVo> selectDictDataList(SysDictDataDTO dto);
 
     /**
      * 根据字典类型和字典键值查询字典数据信息
@@ -57,24 +58,24 @@ public interface SysDictDataService {
     /**
      * 新增保存字典数据信息
      *
-     * @param sysDictData 字典数据信息
+     * @param dto 字典数据信息
      * @return 结果
      */
-    List<SysDictDataVo> insertDictData(SysDictData sysDictData);
+    List<SysDictDataVo> insertDictData(SysDictDataDTO dto);
 
     /**
      * 修改保存字典数据信息
      *
-     * @param sysDictData 字典数据信息
+     * @param dto 字典数据信息
      * @return 结果
      */
-    List<SysDictDataVo> updateDictData(SysDictData sysDictData);
+    List<SysDictDataVo> updateDictData(SysDictDataDTO dto);
 
     /**
      * 校验字典键值是否唯一
      *
-     * @param sysDictData 字典数据
+     * @param dto 字典数据
      * @return 结果
      */
-    boolean checkDictDataUnique(SysDictData sysDictData);
+    boolean checkDictDataUnique(SysDictDataDTO dto);
 }

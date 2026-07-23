@@ -18,6 +18,10 @@
         </dependency>
         <dependency>
             <groupId>com.mhd</groupId>
+            <artifactId>boot-common-doc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.mhd</groupId>
             <artifactId>boot-common-mybatis</artifactId>
         </dependency>
         <dependency>
@@ -27,6 +31,14 @@
         <dependency>
             <groupId>com.mhd</groupId>
             <artifactId>boot-common-operatelog</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.mhd</groupId>
+            <artifactId>boot-common-idempotent</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.mhd</groupId>
+            <artifactId>boot-common-sse</artifactId>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

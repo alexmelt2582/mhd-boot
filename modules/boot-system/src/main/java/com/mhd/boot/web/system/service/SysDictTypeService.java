@@ -32,7 +32,6 @@ public interface SysDictTypeService {
      */
     List<SysDictTypeVo> selectPageDictTypeList(SysDictTypeDTO sysDictTypeDTO);
 
-
     /**
      * 根据所有字典类型
      *

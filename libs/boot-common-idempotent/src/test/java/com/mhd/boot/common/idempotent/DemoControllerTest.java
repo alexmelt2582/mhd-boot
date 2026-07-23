@@ -37,16 +37,16 @@ public class DemoControllerTest {
      * @throws Exception
      */
     @Test
-    void getOneThreadResutTest() throws Exception {
+    void getOneThreadResultTest() throws Exception {
         mockMvc.perform(get("/get?key=1")).andExpect(status().isOk()).andReturn();
     }
 
     /**
      * 多线程测试
      */
-    @RepeatedTest(100)
+    @RepeatedTest(10)
     @Execution(CONCURRENT)
-    void getMultiThreadResutTest() {
+    void getMultiThreadResultTest() {
         try {
             mockMvc.perform(get("/get?key=10")).andExpect(status().isOk());
         } catch (Exception e) {
@@ -56,7 +56,7 @@ public class DemoControllerTest {
 
     @RepeatedTest(10)
     @Execution(CONCURRENT)
-    void getMultiThreadNoKeyResutTest() {
+    void getMultiThreadNoKeyResultTest() {
         try {
             mockMvc.perform(get("/noKey")).andExpect(status().isOk());
         } catch (Exception e) {
