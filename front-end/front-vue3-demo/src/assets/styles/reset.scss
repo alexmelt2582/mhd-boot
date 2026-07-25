@@ -1,0 +1,8 @@
+/* 设置 html、body 和 #app 元素的高度为视口的 100%，并移除默认的内边距和外边距 */
+html,
+body,
+#app {
+  height: 100%;
+  padding: 0;
+  margin: 0;
+}
