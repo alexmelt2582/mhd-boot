@@ -1,32 +1,34 @@
-import type {InternalAxiosRequestConfig} from 'axios'
-import axios, {AxiosError} from 'axios'
-import {meMsgError} from '@/utils/modal' // 保持原有错误提示工具
-import {useUserStore} from '@/store/modules/user' // Pinia 用户仓库
-import {appConfig} from '@/settings'
+import type { InternalAxiosRequestConfig } from 'axios'
+import axios, { AxiosError } from 'axios'
+import { meMsgError } from '@/utils/modal'
+import { useUserStore } from '@/store/modules/user'
+import { appConfig } from '@/settings'
 
-const BASE_URL = import.meta.env.VITE_WEB_BASE_URL
+const BASE_URL = import.meta.env.VITE_APP_SERVER_PATH
 
 const service = axios.create({
   baseURL: BASE_URL,
-  timeout: appConfig.timeout || 5000
+  timeout: appConfig.timeout || 5000,
 })
+
 export interface BaseResponse<T = any> {
-  code: number;
-  msg: string;
-  data: T;
+  code: string
+  msg: string
+  data: T
 }
 
 export interface PageResponse<T = any> {
-  total: number;
-  list: T[];
+  total: number
+  list: T[]
 }
+
 /**
  * 请求拦截器
  */
 service.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const userStore = useUserStore() // 获取 Pinia 用户仓库
-    const token = userStore.token // 从 Pinia 获取 token
+    const userStore = useUserStore()
+    const token = userStore.token
     if (token && config.headers) {
       config.headers[appConfig.tokenKey] = token
     }
@@ -65,9 +67,8 @@ service.interceptors.response.use(
         }, 1000)
       })
     }
-    // 其他错误提示
-    const message = data.message || '服务器未知错误'
-    meMsgError({message})
+    const message = data.msg || data.message || '服务器未知错误'
+    meMsgError({ message })
     return Promise.reject(message)
   },
   (error: AxiosError) => {

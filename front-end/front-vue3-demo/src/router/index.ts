@@ -1,34 +1,19 @@
-import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router'
-import { errorRouter, layoutRouter, staticRouter } from '@/router/modules/staticRouter.ts'
-import nprogress from '@/utils/nprogress.ts'
-import { appConfig } from '@/settings.ts'
-import { useUserStore } from '@/store/modules/user.ts'
-import { meMsgWarning } from '@/utils/modal.ts'
-import { LOGIN_URL, ROUTER_WHITE_LIST } from '@/config'
+import { createRouter, createWebHistory } from 'vue-router'
+import { adminRouter, errorRouter, staticRouter, userRouter } from '@/router/modules/staticRouter'
+import nprogress from '@/utils/nprogress'
+import { appConfig } from '@/settings'
+import { useUserStore } from '@/store/modules/user'
+import { meMsgWarning } from '@/utils/modal'
+import { ADMIN_LOGIN_URL, LOGIN_URL, ROUTER_WHITE_LIST } from '@/config'
 
-// .env配置文件读取
-// const mode = import.meta.env.VITE_ROUTER_MODE;
-const mode = 'history'
-
-// 路由访问两种模式：带#号的哈希模式，正常路径的web模式。
-const routerMode = {
-  hash: () => createWebHashHistory(),
-  history: () => createWebHistory()
-}
-
-// 创建路由器对象
 const router = createRouter({
-  // 路由模式hash或者默认不带#
-  history: routerMode[mode](),
-  routes: [...layoutRouter, ...staticRouter, ...errorRouter],
+  history: createWebHistory(),
+  routes: [...staticRouter, ...userRouter, ...adminRouter, ...errorRouter],
   strict: false,
   // 滚动行为
   scrollBehavior() {
-    return {
-      left: 0,
-      top: 0
-    }
-  }
+    return { left: 0, top: 0 }
+  },
 })
 
 /**
@@ -38,38 +23,44 @@ router.beforeEach(async (to, from, next) => {
   // 1、NProgress 开始
   nprogress.start()
   // 2、标题切换，没有防止后置路由，是因为页面路径不存在，title会变成undefined
-  document.title = to.meta.title || appConfig.title
+  document.title = (to.meta.title as string) || appConfig.title
   // 3、判断是访问登陆页，有Token访问当前页面，token过期访问接口，axios封装则自动跳转登录页面，没有Token重置路由到登陆页。
-  const useStore = useUserStore()
-  if (to.path.toLocaleLowerCase() === LOGIN_URL) {
-    // 有Token访问当前页面
-    if (useStore.token) {
+  const userStore = useUserStore()
+
+  if (to.path === LOGIN_URL || to.path === ADMIN_LOGIN_URL) {
+    if (userStore.token) {
       return next(from.fullPath)
     }
-    meMsgWarning({
-      message: '账号身份已过期，请重新登录'
-    })
     return next()
   }
+
   // 4、判断访问页面是否在路由白名单地址[静态路由]中，如果存在直接放行。
   if (ROUTER_WHITE_LIST.includes(to.path)) return next()
+
   // 5、判断进入的页面是否需要用户登录，如果需要，并且用户此时未登录
-  if (to.meta && to.meta.requireAuth && !useStore.token) {
-    return next({ path: LOGIN_URL, replace: true })
+  if (to.meta && to.meta.requiresAuth && !userStore.token) {
+    const loginPath = to.path.startsWith('/admin') ? ADMIN_LOGIN_URL : LOGIN_URL
+    meMsgWarning({ message: '请先登录' })
+    return next({ path: loginPath, replace: true })
   }
+
+  // Check role-based access for admin routes
+  if (to.meta.roles && to.meta.roles.length > 0) {
+    if (!userStore.hasPermission(to.meta.roles)) {
+      meMsgWarning({ message: '无权限访问该页面' })
+      return next({ path: '/403', replace: true })
+    }
+  }
+
   // 6、页面刷新后，如果用户信息不存在重新获取用户信息
-  if (useStore.token && !useStore.userInfo?.id) {
-    await useStore.getUserInfo()
+  if (userStore.token && !userStore.userInfo?.id) {
+    await userStore.getUserInfo()
   }
   // 7、正常访问页面。
   next()
 })
 
-/**
- * @description 重置路由
- */
-export const resetRouter = () => {
-}
+
 
 /**
  * @description 路由跳转错误
@@ -86,7 +77,8 @@ router.onError((error) => {
 router.afterEach((to, from) => {
   // 结束全屏动画
   nprogress.done()
-  // console.log("后置守卫", to, from);
+  console.warn('路由错误', error.message)
 })
 
 export default router
+

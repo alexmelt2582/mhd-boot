@@ -8,14 +8,11 @@ export interface AppConfig {
   timeout: number;
   /** 发给后端的 token 请求头名 */
   tokenKey: string;
-  /** token 在浏览器 cookie 中的 key */
-  tokenCookieKey: string;
 }
 
 /** 默认配置 */
 export const appConfig: AppConfig = {
-  title: '系统',
-  timeout: 2 * 60 * 1000, // 2 分钟
+  title: '智慧图书馆空间预约系统',
+  timeout: 2 * 60 * 1000,
   tokenKey: 'Authorization',
-  tokenCookieKey: 'me-token',
-};
+}

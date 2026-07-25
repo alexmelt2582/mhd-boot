@@ -1,9 +1,9 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 // 引入 router
-import router from '@/router/index.ts'
+import router from '@/router/index'
 // 引入仓库pinia
-import pinia from "./store/index.ts";
+import pinia from "@/store/index";
 // 引入 ElementPlus
 import ElementPlus from 'element-plus'
 // 引入 ElementPlus 的样式
