@@ -3,9 +3,8 @@
 /* ===== 自定义主题 ===== */
 @theme {
   --font-sans: Inter, ui-sans-serif, system-ui, sans-serif;
-  --color-dark: #0f172a;              /* Slate-900 */
-  /* 动态主/辅色（rgb 通道格式，支持 /50 透明度） */
-  --color-primary: #ec4899;
+  --color-dark: #0f172a;
+  --color-primary: #3b82f6;
   --color-secondary: #8b5cf6;
 }
 

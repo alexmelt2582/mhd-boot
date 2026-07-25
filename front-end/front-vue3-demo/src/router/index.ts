@@ -1,10 +1,11 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import { adminRouter, errorRouter, staticRouter, userRouter } from '@/router/modules/staticRouter'
+import {createRouter, createWebHistory} from 'vue-router'
+import {adminRouter, staticRouter, userRouter} from '@/router/modules/staticRouter'
+import {errorRouter} from '@/router/modules/errorRouter'
 import nprogress from '@/utils/nprogress'
-import { appConfig } from '@/settings'
-import { useUserStore } from '@/store/modules/user'
-import { meMsgWarning } from '@/utils/modal'
-import { ADMIN_LOGIN_URL, LOGIN_URL, ROUTER_WHITE_LIST } from '@/config'
+import {appConfig} from '@/settings'
+import {useUserStore} from '@/store/modules/user'
+import {meMsgWarning} from '@/utils/modal'
+import {ADMIN_LOGIN_URL, LOGIN_URL, ROUTER_WHITE_LIST} from '@/config'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -12,7 +13,7 @@ const router = createRouter({
   strict: false,
   // 滚动行为
   scrollBehavior() {
-    return { left: 0, top: 0 }
+    return {left: 0, top: 0}
   },
 })
 
@@ -40,15 +41,15 @@ router.beforeEach(async (to, from, next) => {
   // 5、判断进入的页面是否需要用户登录，如果需要，并且用户此时未登录
   if (to.meta && to.meta.requiresAuth && !userStore.token) {
     const loginPath = to.path.startsWith('/admin') ? ADMIN_LOGIN_URL : LOGIN_URL
-    meMsgWarning({ message: '请先登录' })
-    return next({ path: loginPath, replace: true })
+    meMsgWarning({message: '请先登录'})
+    return next({path: loginPath, replace: true})
   }
 
   // Check role-based access for admin routes
   if (to.meta.roles && to.meta.roles.length > 0) {
     if (!userStore.hasPermission(to.meta.roles)) {
-      meMsgWarning({ message: '无权限访问该页面' })
-      return next({ path: '/403', replace: true })
+      meMsgWarning({message: '无权限访问该页面'})
+      return next({path: '/403', replace: true})
     }
   }
 
@@ -59,7 +60,6 @@ router.beforeEach(async (to, from, next) => {
   // 7、正常访问页面。
   next()
 })
-
 
 
 /**
@@ -74,10 +74,9 @@ router.onError((error) => {
 /**
  * @description 后置路由
  */
-router.afterEach((to, from) => {
+router.afterEach(() => {
   // 结束全屏动画
   nprogress.done()
-  console.warn('路由错误', error.message)
 })
 
 export default router

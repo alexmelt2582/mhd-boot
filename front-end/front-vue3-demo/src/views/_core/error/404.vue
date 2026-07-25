@@ -2,8 +2,8 @@
   <div class="me-box">
     <div class="me-top"></div>
     <div class="me-bottom">
-      <div class="me-text1">403</div>
-      <div class="me-text2">对不起，您没有权限访问👻</div>
+      <div class="me-text1">404</div>
+      <div class="me-text2">您想看的页面不存在哟🤐</div>
       <div style="height: 20px"></div>
       <el-button type="primary" plain @click="handleHomePage"
         >返回首页
@@ -24,7 +24,7 @@ function handleHomePage() {
   overflow: hidden;
 
   .me-top {
-    background: url("@/assets/images/error/403.png") no-repeat;
+    background: url("@/assets/images/_core/error/404.png") no-repeat;
     background-size: 100%;
     width: 600px;
     height: 500px;

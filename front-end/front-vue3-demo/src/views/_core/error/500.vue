@@ -2,11 +2,11 @@
   <div class="me-box">
     <div class="me-top"></div>
     <div class="me-bottom">
-      <div class="me-text1">404</div>
-      <div class="me-text2">您想看的页面不存在哟🤐</div>
+      <div class="me-text1">500</div>
+      <div class="me-text2">服务器好像开小差了！请稍后试试...😱</div>
       <div style="height: 20px"></div>
       <el-button type="primary" plain @click="handleHomePage"
-        >返回首页
+      >返回首页
       </el-button>
     </div>
   </div>
@@ -14,6 +14,7 @@
 
 <script setup lang="ts">
 const router = useRouter()
+
 function handleHomePage() {
   router.push('/')
 }
@@ -24,7 +25,7 @@ function handleHomePage() {
   overflow: hidden;
 
   .me-top {
-    background: url("@/assets/images/error/404.png") no-repeat;
+    background: url("@/assets/images/_core/error/500.png") no-repeat;
     background-size: 100%;
     width: 600px;
     height: 500px;

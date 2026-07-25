@@ -22,6 +22,9 @@ export interface PageResponse<T = any> {
   list: T[]
 }
 
+/** Mock 开关：开发环境默认开启 */
+export const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true' || true
+
 /**
  * 请求拦截器
  */
