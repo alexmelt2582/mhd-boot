@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        --me-theme-color: #2158e8; /* 主题色 */
+        --me-background-color: #FFFFFF; /* 背景色 */
+        --me-hover-background-color: #F5F7FA; /* 悬浮背景色 */
+        --me-active-background-color: #E4E7ED; /* 激活背景色 */
+        --me-text-color: #303133; /* 默认文本颜色 */
+        --me-active-text-color: #409EFF; /* 激活文本颜色 */
+        --me-hover-text-color: #606266; /* 悬浮文本颜色 */
+        --me-hint-text-color: #909399; /* 提示词颜色 */
+        --me-success-color: #67C23A; /* 成功颜色 */
+        --me-warning-color: #E6A23C; /* 警告颜色 */
+        --me-danger-color: #F56C6C; /* 危险颜色 */
+    }
+
+    .dark {
+        --me-theme-color: #409EFF;
+        --me-background-color: #1F1F1F;
+        --me-hover-background-color: #333333;
+        --me-active-background-color: #2B2B2B;
+        --me-text-color: #FFFFFF;
+        --me-active-text-color: #409EFF;
+        --me-hover-text-color: #A0A1A3;
+        --me-hint-text-color: #6A6C6E;
+        --me-success-color: #67C23A;
+        --me-warning-color: #E6A23C;
+        --me-danger-color: #F56C6C;
+    }
+}

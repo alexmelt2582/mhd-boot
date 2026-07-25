@@ -1,0 +1,94 @@
+/* =================================
+   Vue 2 全局过渡动画样式
+   ================================= */
+
+/* 基础淡入淡出效果 */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease-in-out;
+}
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* 淡入淡出 + 位移效果 */
+.fade-transform-enter-active,
+.fade-transform-leave-active {
+  transition: all 0.3s ease-in-out;
+}
+
+.fade-transform-enter {
+  opacity: 0;
+  transform: translateX(-30px);
+}
+
+.fade-transform-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+/* 面包屑导航过渡效果 */
+.breadcrumb-enter-active,
+.breadcrumb-leave-active {
+  transition: all 0.3s ease-in-out;
+}
+
+.breadcrumb-enter,
+.breadcrumb-leave-to {
+  opacity: 0;
+  transform: translateX(20px);
+}
+
+.breadcrumb-move {
+  transition: all 0.3s ease-in-out;
+}
+
+.breadcrumb-leave-active {
+  position: absolute;
+}
+
+/* =================================
+   可选：扩展过渡效果
+   ================================= */
+
+/* 上下滑动效果 */
+.slide-up-enter-active,
+.slide-up-leave-active {
+  transition: all 0.3s ease-in-out;
+}
+
+.slide-up-enter {
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.slide-up-leave-to {
+  opacity: 0;
+  transform: translateY(-30px);
+}
+
+/* 缩放效果 */
+.zoom-enter-active,
+.zoom-leave-active {
+  transition: all 0.3s ease-in-out;
+}
+
+.zoom-enter,
+.zoom-leave-to {
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+/* 旋转淡入效果 */
+.rotate-enter-active,
+.rotate-leave-active {
+  transition: all 0.3s ease-in-out;
+}
+
+.rotate-enter,
+.rotate-leave-to {
+  opacity: 0;
+  transform: rotate(-10deg) scale(0.9);
+}
