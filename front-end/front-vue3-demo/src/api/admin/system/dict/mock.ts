@@ -1,5 +1,7 @@
 import type { BaseResponse } from '@/utils/service'
 import type { DictVO, DictDTO } from './type'
+import {mockFail, mockSuccess} from "@/utils/mock.ts";
+import {patchObject} from "@/utils/other.ts";
 
 /* ================================================================
  * 字典数据 —— 与后端 sys_dict DDL INSERT 数据完全一致
@@ -51,9 +53,8 @@ const delay = () => new Promise((r) => setTimeout(r, 200 + Math.random() * 300))
 
 /** 根据字典类型获取字典列表 */
 export async function mockGetDictByType(dictType: string): Promise<BaseResponse<DictVO[]>> {
-  await delay()
   const items = dictList.filter((d) => d.dictType === dictType).sort((a, b) => a.sortOrder - b.sortOrder)
-  return { code: 0, msg: 'ok', data: items }
+  return mockSuccess(items)
 }
 
 /** 获取全部字典（按类型分组） */
@@ -68,22 +69,21 @@ export async function mockGetAllDicts(): Promise<BaseResponse<{ dictType: string
     dictType,
     items: items.sort((a, b) => a.sortOrder - b.sortOrder),
   }))
-  return { code: 0, msg: 'ok', data: result }
+  return mockSuccess(result)
 }
 
 /** 保存字典（新增或更新） */
 export async function mockSaveDict(data: DictDTO): Promise<BaseResponse<null>> {
-  await delay()
   if (data.id) {
     // 更新
     const idx = dictList.findIndex((d) => d.id === data.id)
-    if (idx === -1) return { code: 404, msg: '字典项不存在', data: null }
-    Object.assign(dictList[idx], data)
-    return { code: 0, msg: '更新成功', data: null }
+    if (idx === -1) return mockFail('字典项不存在')
+    patchObject(dictList[idx]!, data);
+    return { code: "0", msg: '更新成功', data: null }
   } else {
     // 新增
     const exists = dictList.find((d) => d.dictType === data.dictType && d.dictValue === data.dictValue)
-    if (exists) return { code: 1001, msg: '字典值已存在', data: null }
+    if (exists) return mockFail('字典值已存在')
     const maxId = Math.max(...dictList.map((d) => d.id), 22)
     dictList.push({
       id: maxId + 1,
@@ -94,15 +94,14 @@ export async function mockSaveDict(data: DictDTO): Promise<BaseResponse<null>> {
       status: data.status ?? 1,
       remark: data.remark || '',
     })
-    return { code: 0, msg: '新增成功', data: null }
+    return mockSuccess(null)
   }
 }
 
 /** 删除字典 */
 export async function mockDeleteDict(id: number): Promise<BaseResponse<null>> {
-  await delay()
   const idx = dictList.findIndex((d) => d.id === id)
-  if (idx === -1) return { code: 404, msg: '字典项不存在', data: null }
+  if (idx === -1) return mockFail('字典项不存在')
   dictList.splice(idx, 1)
-  return { code: 0, msg: '删除成功', data: null }
+  return mockSuccess(null)
 }

@@ -1,8 +1,10 @@
-import type { InternalAxiosRequestConfig } from 'axios'
+import type {AxiosResponse, InternalAxiosRequestConfig} from 'axios'
 import axios, { AxiosError } from 'axios'
 import { meMsgError } from '@/utils/modal'
 import { useUserStore } from '@/store/modules/user'
 import { appConfig } from '@/settings'
+import {RESPONSE_CODE} from "@/constants/status.ts";
+import {useMessage} from "@/hooks/message.ts";
 
 const BASE_URL = import.meta.env.VITE_APP_SERVER_PATH
 
@@ -46,35 +48,48 @@ service.interceptors.request.use(
  * 响应拦截器
  */
 service.interceptors.response.use(
-  (res: any) => {
-    // 处理文件流响应（Blob/ArrayBuffer）
-    if (res.request.responseType === 'blob' || res.request.responseType === 'arraybuffer') {
-      return res
+  async (response: AxiosResponse) => {
+    const { config, data, headers } = response;
+    // ==========================================
+    // 第一步：如果是文件流（Blob/ArrayBuffer），直接返回
+    // ==========================================
+    // 判断依据：请求配置中指定了 responseType 为 blob 或 arraybuffer
+    if (config.responseType === 'blob' || config.responseType === 'arraybuffer') {
+      // 如果返回的是 application/json，说明实际上是报错了，需要将 blob 转为文本错误信息
+      const contentType = headers['content-type'] || '';
+      if (contentType.includes('application/json')) {
+        // 如果拿到的是 blob 但包含 JSON 报错（例如权限不足返回 403）
+        const text = await new Response(data).text();
+        const jsonError = JSON.parse(text);
+        // 直接拦截并报错，不要继续下载错误内容的文件
+        useMessage().error(jsonError.msg || '下载失败');
+        return Promise.reject(new Error(jsonError.msg || 'Error'));
+      }
+      // 正常情况下，直接返回 Blob 流，让外部 `downBlobFile` 去处理
+      return data;
     }
-    const {data} = res
-    const code = data.code
-    // 无 code 时直接返回数据（如列表接口）
-    if (code === undefined) {
-      return data
+
+    // ==========================================
+    // 第二步：正常 JSON 业务接口，统一处理状态码
+    // ==========================================
+    const res = data;
+    // 校验后台约定的成功状态码
+    if (res.code === RESPONSE_CODE.SUCCESS) {
+      // 直接返回 data
+      return res.data;
     }
-    // 成功响应（后端约定 code=0 为成功）
-    if (code === 0) {
-      return data
-    }
-    // Token 异常（需登录）
-    if (code === 100300002 || code === 401) {
+    // 权限拦截
+    if (res.code === RESPONSE_CODE.UNAUTHORIZED || res.code === RESPONSE_CODE.FORBIDDEN) {
       const userStore = useUserStore()
-      userStore.HandleLogout().then(() => {
-        setTimeout(() => {
-          location.reload()
-        }, 1000)
-      })
+      userStore.HandleLogout()
+      return Promise.reject(new Error('登录已过期'));
     }
-    const message = data.msg || data.message || '服务器未知错误'
-    meMsgError({ message })
-    return Promise.reject(message)
+
+    // 业务失败
+    useMessage().error(res.msg || '操作失败');
+    return Promise.reject(new Error(res.msg || 'Error'));
   },
-  (error: AxiosError) => {
+  (error) => {
     // 处理网络/HTTP 错误
     const errorMsg = error.response?.status
       ? getHttpErrorMessage(error.response.status)
@@ -82,7 +97,7 @@ service.interceptors.response.use(
 
     meMsgError({message: errorMsg})
     return Promise.reject(error)
-  },
+  }
 )
 
 /**

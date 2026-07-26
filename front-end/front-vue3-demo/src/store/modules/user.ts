@@ -1,9 +1,9 @@
-import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
-import type { UserVO } from '@/api/auth/type'
-import { mockGetUserInfo } from '@/api/auth/mock'
-import { useRouter } from 'vue-router'
-import { ADMIN_LOGIN_URL, LOGIN_URL } from '@/config'
+import {defineStore} from 'pinia'
+import {computed, ref} from 'vue'
+import type {UserVO} from '@/api/auth/type'
+import router from '@/router';
+import {ADMIN_LOGIN_URL, LOGIN_URL} from '@/config'
+import {getLoginUserInfo} from "@/api/auth/api.ts";
 
 export const useUserStore = defineStore('user', () => {
   const token = ref<string>(localStorage.getItem('library_token') || '')
@@ -24,19 +24,18 @@ export const useUserStore = defineStore('user', () => {
 
   async function getUserInfo() {
     try {
-      const res = await mockGetUserInfo()
+      const res = await getLoginUserInfo()
       userInfo.value = res.data
     } catch {
-      // mock fallback
     }
   }
 
   async function HandleLogout() {
+    const path = isAdmin ? ADMIN_LOGIN_URL : LOGIN_URL
     token.value = ''
     userInfo.value = null
     localStorage.removeItem('library_token')
-    const router = useRouter()
-    await router.push(LOGIN_URL)
+    await router.push(path)
   }
 
   function hasPermission(roles: string[]): boolean {

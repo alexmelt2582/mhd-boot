@@ -35,7 +35,7 @@ export default defineConfig(({ command, mode }: ConfigEnv) => {
     },
     server: {
       // 服务器将监听所有公共 IP
-      host: '0.0.0.0',
+      // host: '0.0.0.0',
       // 服务器的端口号
       port: Number(env.VITE_APP_PORT) || 18080,
       // 设置为 true 时，Vite 会在启动时自动打开浏览器窗口
