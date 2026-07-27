@@ -1,36 +1,68 @@
-/** 字典VO */
-export interface DictVO {
-  /** 字典ID */
-  id: number
-  /** 字典类型，如 space_type / area_name / floor / equipment_type / violation_type / message_type */
+/** 字典类型VO */
+export interface DictTypeVO {
+  /** 字典主键 */
+  dictId: number
+  /** 字典名称 */
+  dictName: string
+  /** 字典类型 */
   dictType: string
-  /** 字典标签（中文展示） */
+  /** 备注 */
+  remark: string
+  /** 创建时间 */
+  createTime: string
+}
+
+/** 字典类型保存DTO */
+export interface DictTypeDTO {
+  dictId?: number
+  dictName: string
+  dictType: string
+  remark?: string
+}
+
+/** 字典类型查询参数 */
+export interface DictTypeQuery {
+  dictName?: string
+  dictType?: string
+  status?: number
+  pageNum?: number
+  pageSize?: number
+}
+
+/** 字典数据VO */
+export interface DictItemVO {
+  /** 字典数据ID */
+  dictItemId: number
+  /** 字典标签 */
   dictLabel: string
-  /** 字典值（存储值） */
+  /** 字典值 */
   dictValue: string
+  /** 字典类型 */
+  dictType: string
   /** 排序 */
-  sortOrder: number
-  /** 状态：0-禁用 1-启用 */
+  dictSort: number
+  /** 状态 */
   status: number
   /** 备注 */
   remark: string
 }
 
-/** 按类型分组的字典 */
-export interface DictTypeGroup {
-  /** 字典类型 */
-  dictType: string
-  /** 该类型下的字典项列表 */
-  items: DictVO[]
-}
-
-/** 字典保存DTO */
-export interface DictDTO {
-  id?: number
-  dictType: string
+/** 字典数据保存DTO */
+export interface DictItemDTO {
+  dictItemId?: number
   dictLabel: string
   dictValue: string
-  sortOrder?: number
+  dictType: string
+  dictSort?: number
   status?: number
   remark?: string
+}
+
+/** 字典数据查询参数 */
+export interface DictItemQuery {
+  dictType?: string
+  dictLabel?: string
+  status?: number
+  pageNum?: number
+  pageSize?: number
 }

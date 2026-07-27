@@ -19,7 +19,7 @@ export interface BaseResponse<T = any> {
   data: T
 }
 
-export interface PageResponse<T = any> {
+export interface PageInfo<T = any> {
   total: number
   list: T[]
 }
