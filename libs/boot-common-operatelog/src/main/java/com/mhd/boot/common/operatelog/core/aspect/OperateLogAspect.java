@@ -90,7 +90,7 @@ public class OperateLogAspect {
             operateLogEvent.setOperateType(operateLog.type().getType());
             if (exception != null) {
                 operateLogEvent.setOperateResult(OperateResultEnum.ERROR.getCode());
-                operateLogEvent.setOperateExceptionDetail(ExceptionUtil.stacktraceToString(exception).getBytes(StandardCharsets.UTF_8));
+                operateLogEvent.setOperateExceptionDetail(ExceptionUtil.stacktraceToString(exception));
             } else {
                 operateLogEvent.setOperateResult(OperateResultEnum.SUCCESS.getCode());
             }

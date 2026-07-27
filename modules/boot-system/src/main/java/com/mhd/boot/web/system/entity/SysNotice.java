@@ -27,7 +27,7 @@ public class SysNotice extends BaseEntity {
     @TableField(value = "notice_title")
     private String noticeTitle;
     /**
-     * 公告类型（1通知 2公告）
+     * 公告类型（1通知 2公告）（字典获取）
      */
     @TableField(value = "notice_type")
     private String noticeType;

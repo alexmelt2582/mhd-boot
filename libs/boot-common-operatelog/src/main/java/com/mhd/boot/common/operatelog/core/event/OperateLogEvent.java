@@ -41,7 +41,7 @@ public class OperateLogEvent {
     /**
      * 操作异常信息
      */
-    private byte[] operateExceptionDetail;
+    private String operateExceptionDetail;
 
     /**
      * 请求方法
