@@ -1,5 +1,7 @@
-import type { BaseResponse } from '@/utils/service'
-import type { LoginReqDTO, LoginVO, RegisterReqDTO, UserVO } from './type'
+import type {BaseResponse} from '@/utils/service'
+import type {LoginReqDTO, LoginVO, RegisterReqDTO, UserVO} from './type'
+import {mockFail, mockSuccess} from "@/utils/mock.ts";
+import {RESPONSE_CODE} from "@/constants/status.ts";
 
 const mockUsers: UserVO[] = [
   {
@@ -52,52 +54,85 @@ const mockUsers: UserVO[] = [
   },
 ]
 
-const delay = () => new Promise((r) => setTimeout(r, 200 + Math.random() * 300))
+function getCurrentUser(): UserVO | null {
+  // 1. 从 sessionStorage 读取 token
+  const token = localStorage.getItem('library_token')
+  if (!token) return null
+
+  // 2. 解析 token (格式: mock-token-1-123456)
+  // 我们约定 token 的第3部分是 userId
+  const parts = token.split('-')
+  if (parts.length >= 3) {
+    const userId = parseInt(parts[2]!)
+    // 3. 根据 userId 查找用户
+    return mockUsers.find(u => u.id === userId) || null
+  }
+  return null
+}
 
 export async function mockLogin(data: LoginReqDTO): Promise<BaseResponse<LoginVO>> {
-  await delay()
   const user = mockUsers.find((u) => u.username === data.username && u.status === 1)
-  if (!user) {
-    return { code: 1001, msg: '用户名不存在', data: null as any }
-  }
-  if (data.password !== '123456') {
-    return { code: 1002, msg: '密码错误', data: null as any }
-  }
+  if (!user) return mockFail('用户名不存在')
+  if (data.password !== '123456') return mockFail('密码错误')
   const token = 'mock-token-' + user.id + '-' + Date.now()
-  return { code: 0, msg: '登录成功', data: { token, user } }
+  return mockSuccess({token, user})
 }
 
 export async function mockRegister(data: RegisterReqDTO): Promise<BaseResponse<null>> {
-  await delay()
-  return { code: 0, msg: '注册成功', data: null }
+  const exists = mockUsers.find(u => u.username === data.username)
+  if (exists) return mockFail('用户名已存在')
+  const maxId = Math.max(...mockUsers.map(d => d.id), 0)
+
+  const newUser: UserVO = {
+    id: maxId + 1,
+    username: data.username,
+    realName: data.realName || '新用户',
+    userType: 'STUDENT',
+    role: 'STUDENT',
+    phone: '',
+    email: '',
+    avatar: '',
+    college: '',
+    creditScore: 100,
+    status: 1,
+    createTime: new Date().toLocaleString(),
+    updateTime: new Date().toLocaleString(),
+    lastLoginTime: ''
+  }
+  mockUsers.push(newUser)
+  return mockSuccess(null)
 }
 
 export async function mockGetUserInfo(): Promise<BaseResponse<UserVO>> {
-  await delay()
-  return { code: 0, msg: 'ok', data: mockUsers[1] }
+  const user = getCurrentUser()
+  if (!user) return mockFail('未登录或登录已过期', RESPONSE_CODE.UNAUTHORIZED)
+  return mockSuccess(user)
 }
 
 export async function mockLogout(): Promise<BaseResponse<null>> {
-  await delay()
-  return { code: 0, msg: '已退出', data: null }
+  return mockSuccess(null)
 }
 
 export async function mockUpdateProfile(data: Partial<UserVO>): Promise<BaseResponse<null>> {
-  await delay()
-  const user = mockUsers[1]
+  const user = getCurrentUser()
+  if (!user) return mockFail('未登录或登录已过期', RESPONSE_CODE.UNAUTHORIZED)
+
   Object.assign(user, data)
-  return { code: 0, msg: '更新成功', data: null }
+  user.updateTime = new Date().toLocaleString()
+  return mockSuccess(null)
 }
 
 export async function mockChangePassword(data: {
   oldPassword: string
   newPassword: string
 }): Promise<BaseResponse<null>> {
-  await delay()
-  if (data.oldPassword !== '123456') {
-    return { code: 1003, msg: '原密码错误', data: null }
-  }
-  return { code: 0, msg: '密码修改成功', data: null }
+  const user = getCurrentUser()
+  if (!user) return mockFail('未登录或登录已过期', RESPONSE_CODE.UNAUTHORIZED)
+
+  // 简单校验逻辑：假设默认密码是 123456
+  if (data.oldPassword !== '123456') return mockFail('原密码错误')
+
+  return mockSuccess(null)
 }
 
-export { mockUsers }
+export {mockUsers}

@@ -20,7 +20,7 @@ export async function register(data: RegisterReqDTO): Promise<BaseResponse<null>
   return service({ url: '/api/auth/register', method: 'post', data }) as any
 }
 
-export async function getUserInfo(): Promise<BaseResponse<UserVO>> {
+export async function getLoginUserInfo(): Promise<BaseResponse<UserVO>> {
   if (USE_MOCK) return mockGetUserInfo()
   return service({ url: '/api/auth/info', method: 'get' }) as any
 }
