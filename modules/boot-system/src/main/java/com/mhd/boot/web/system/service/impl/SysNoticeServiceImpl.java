@@ -2,11 +2,12 @@ package com.mhd.boot.web.system.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.mhd.boot.common.mybatis.core.domain.PageInfo;
 import com.mhd.boot.common.mybatis.core.domain.PageParam;
-import com.mhd.boot.common.mybatis.core.domain.PageResponse;
 import com.mhd.boot.common.mybatis.core.domain.PageResultUtils;
 import com.mhd.boot.common.mybatis.core.utils.MybatisPlusUtils;
 import com.mhd.boot.common.mybatis.core.wrapper.LambdaQueryWrapperX;
+import com.mhd.boot.common.respnsedata.BaseResponse;
 import com.mhd.boot.common.utils.MapstructUtils;
 import com.mhd.boot.web.system.entity.SysNotice;
 import com.mhd.boot.web.system.mapper.SysNoticeMapper;
@@ -28,8 +29,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SysNoticeServiceImpl implements SysNoticeService {
     private final SysNoticeMapper baseMapper;
+
     @Override
-    public PageResponse<SysNoticeVo> selectPageNoticeList(SysNoticeDTO dto, PageParam pageParam) {
+    public BaseResponse<PageInfo<SysNoticeVo>> selectPageNoticeList(SysNoticeDTO dto, PageParam pageParam) {
         Page<SysNotice> page = MybatisPlusUtils.buildPage(pageParam, null);
         LambdaQueryWrapperX<SysNotice> wrapperX = buildQueryWrapper(dto);
         IPage<SysNoticeVo> voPage = MybatisPlusUtils.selectVoPage(baseMapper, page, wrapperX, SysNoticeVo.class);

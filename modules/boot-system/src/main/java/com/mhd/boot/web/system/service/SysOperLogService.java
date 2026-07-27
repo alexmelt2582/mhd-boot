@@ -1,7 +1,8 @@
 package com.mhd.boot.web.system.service;
 
+import com.mhd.boot.common.mybatis.core.domain.PageInfo;
 import com.mhd.boot.common.mybatis.core.domain.PageParam;
-import com.mhd.boot.common.mybatis.core.domain.PageResponse;
+import com.mhd.boot.common.respnsedata.BaseResponse;
 import com.mhd.boot.web.system.model.dto.SysOperLogDTO;
 import com.mhd.boot.web.system.model.vo.SysOperLogVo;
 
@@ -20,7 +21,7 @@ public interface SysOperLogService {
      * @param pageParam 分页参数
      * @return 操作日志分页列表
      */
-    PageResponse<SysOperLogVo> selectPageOperLogList(SysOperLogDTO dto, PageParam pageParam);
+    BaseResponse<PageInfo<SysOperLogVo>> selectPageOperLogList(SysOperLogDTO dto, PageParam pageParam);
 
     /**
      * 查询系统操作日志集合

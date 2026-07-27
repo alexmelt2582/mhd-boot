@@ -2,8 +2,8 @@ package com.mhd.boot.web.system.controller;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.mhd.boot.common.idempotent.annotation.RepeatSubmit;
+import com.mhd.boot.common.mybatis.core.domain.PageInfo;
 import com.mhd.boot.common.mybatis.core.domain.PageParam;
-import com.mhd.boot.common.mybatis.core.domain.PageResponse;
 import com.mhd.boot.common.operatelog.core.annotation.OperateLog;
 import com.mhd.boot.common.operatelog.core.enums.OperateTypeEnum;
 import com.mhd.boot.common.respnsedata.BaseResponse;
@@ -34,10 +34,10 @@ public class SysDictItemController {
     private final SysDictItemService dictDataService;
 
     /**
-     * 查询字典数据列表
+     * 分页查询字典数据列表
      */
-    @GetMapping("/list")
-    public PageResponse<SysDictItemVo> list(SysDictItemDTO sysDictItemDTO, PageParam pageParam) {
+    @GetMapping("/page")
+    public BaseResponse<PageInfo<SysDictItemVo>> page(SysDictItemDTO sysDictItemDTO, PageParam pageParam) {
         return dictDataService.selectPageDictItemList(sysDictItemDTO, pageParam);
     }
 

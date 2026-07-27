@@ -7,12 +7,13 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mhd.boot.common.enums.ErrorCodeEnum;
 import com.mhd.boot.common.exception.BusinessException;
+import com.mhd.boot.common.mybatis.core.domain.PageInfo;
 import com.mhd.boot.common.mybatis.core.domain.PageParam;
-import com.mhd.boot.common.mybatis.core.domain.PageResponse;
 import com.mhd.boot.common.mybatis.core.domain.PageResultUtils;
 import com.mhd.boot.common.mybatis.core.utils.MybatisPlusUtils;
 import com.mhd.boot.common.mybatis.core.wrapper.LambdaQueryWrapperX;
 import com.mhd.boot.common.redis.utils.CacheUtils;
+import com.mhd.boot.common.respnsedata.BaseResponse;
 import com.mhd.boot.common.utils.MapstructUtils;
 import com.mhd.boot.common.utils.SpringUtils;
 import com.mhd.boot.common.utils.StringUtils;
@@ -48,7 +49,7 @@ public class SysDictTypeServiceImpl implements SysDictTypeService, DictService {
     private final SysDictItemMapper dictItemMapper;
 
     @Override
-    public PageResponse<SysDictTypeVo> selectPageDictTypeList(SysDictTypeDTO dto, PageParam pageParam) {
+    public BaseResponse<PageInfo<SysDictTypeVo>> selectPageDictTypeList(SysDictTypeDTO dto, PageParam pageParam) {
         Page<SysDictType> page = MybatisPlusUtils.buildPage(pageParam, null);
         LambdaQueryWrapperX<SysDictType> wrapperX = buildQueryWrapper(dto);
         IPage<SysDictTypeVo> voPage = MybatisPlusUtils.selectVoPage(baseMapper, page, wrapperX, SysDictTypeVo.class);

@@ -1,7 +1,8 @@
 package com.mhd.boot.web.system.service;
 
+import com.mhd.boot.common.mybatis.core.domain.PageInfo;
 import com.mhd.boot.common.mybatis.core.domain.PageParam;
-import com.mhd.boot.common.mybatis.core.domain.PageResponse;
+import com.mhd.boot.common.respnsedata.BaseResponse;
 import com.mhd.boot.web.system.model.dto.SysDictTypeDTO;
 import com.mhd.boot.web.system.model.vo.SysDictItemVo;
 import com.mhd.boot.web.system.model.vo.SysDictTypeVo;
@@ -18,10 +19,10 @@ public interface SysDictTypeService {
      * 分页查询字典类型列表
      *
      * @param sysDictTypeDTO 查询条件
-     * @param pageParam   分页参数
+     * @param pageParam      分页参数
      * @return 字典类型分页列表
      */
-    PageResponse<SysDictTypeVo> selectPageDictTypeList(SysDictTypeDTO sysDictTypeDTO, PageParam pageParam);
+    BaseResponse<PageInfo<SysDictTypeVo>> selectPageDictTypeList(SysDictTypeDTO sysDictTypeDTO, PageParam pageParam);
 
     /**
      * 根据条件查询字典类型

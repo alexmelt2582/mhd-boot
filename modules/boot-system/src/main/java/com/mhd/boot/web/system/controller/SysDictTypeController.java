@@ -2,8 +2,8 @@ package com.mhd.boot.web.system.controller;
 
 import com.baomidou.lock.annotation.Lock4j;
 import com.mhd.boot.common.idempotent.annotation.RepeatSubmit;
+import com.mhd.boot.common.mybatis.core.domain.PageInfo;
 import com.mhd.boot.common.mybatis.core.domain.PageParam;
-import com.mhd.boot.common.mybatis.core.domain.PageResponse;
 import com.mhd.boot.common.operatelog.core.annotation.OperateLog;
 import com.mhd.boot.common.operatelog.core.enums.OperateTypeEnum;
 import com.mhd.boot.common.respnsedata.BaseResponse;
@@ -31,10 +31,10 @@ public class SysDictTypeController {
     private final SysDictTypeService dictTypeService;
 
     /**
-     * 查询字典类型列表
+     * 分页查询字典类型列表
      */
-    @GetMapping("/list")
-    public PageResponse<SysDictTypeVo> list(SysDictTypeDTO dictType, PageParam pageParam) {
+    @GetMapping("/page")
+    public BaseResponse<PageInfo<SysDictTypeVo>> page(SysDictTypeDTO dictType, PageParam pageParam) {
         return dictTypeService.selectPageDictTypeList(dictType, pageParam);
     }
 

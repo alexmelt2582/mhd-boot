@@ -3,12 +3,13 @@ package com.mhd.boot.web.system.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.mhd.boot.common.mybatis.core.domain.PageInfo;
 import com.mhd.boot.common.mybatis.core.domain.PageParam;
-import com.mhd.boot.common.mybatis.core.domain.PageResponse;
 import com.mhd.boot.common.mybatis.core.domain.PageResultUtils;
 import com.mhd.boot.common.mybatis.core.utils.MybatisPlusUtils;
 import com.mhd.boot.common.mybatis.core.wrapper.LambdaQueryWrapperX;
 import com.mhd.boot.common.operatelog.core.event.OperateLogEvent;
+import com.mhd.boot.common.respnsedata.BaseResponse;
 import com.mhd.boot.common.utils.MapstructUtils;
 import com.mhd.boot.web.system.entity.SysOperLog;
 import com.mhd.boot.web.system.mapper.SysOperLogMapper;
@@ -48,7 +49,7 @@ public class SysOperLogServiceImpl implements SysOperLogService {
     }
 
     @Override
-    public PageResponse<SysOperLogVo> selectPageOperLogList(SysOperLogDTO dto, PageParam pageParam) {
+    public BaseResponse<PageInfo<SysOperLogVo>> selectPageOperLogList(SysOperLogDTO dto, PageParam pageParam) {
         Page<SysOperLog> page = MybatisPlusUtils.buildPage(pageParam, null);
         LambdaQueryWrapperX<SysOperLog> wrapperX = buildQueryWrapper(dto);
         IPage<SysOperLogVo> voPage = MybatisPlusUtils.selectVoPage(baseMapper, page, wrapperX, SysOperLogVo.class);

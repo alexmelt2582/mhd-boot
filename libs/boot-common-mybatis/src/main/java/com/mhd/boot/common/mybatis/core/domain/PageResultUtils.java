@@ -1,7 +1,8 @@
 package com.mhd.boot.common.mybatis.core.domain;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.mhd.boot.common.enums.ErrorCodeEnum;
+import com.mhd.boot.common.respnsedata.BaseResponse;
+import com.mhd.boot.common.respnsedata.BaseResultUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -21,12 +22,8 @@ public final class PageResultUtils {
      * @param list  列表数据
      * @param total 总记录数
      */
-    public static <T> PageResponse<T> build(List<T> list, long total) {
-        PageResponse<T> pageResponse = new PageResponse<>();
-        pageResponse.setCode(ErrorCodeEnum.SUCCESS.getCode());
-        pageResponse.setMessage(ErrorCodeEnum.SUCCESS.getMessage());
-        pageResponse.setData(new PageResponse.PageInfo<>(list, total));
-        return pageResponse;
+    public static <T> BaseResponse<PageInfo<T>> build(List<T> list, long total) {
+        return BaseResultUtils.successOfData(new PageInfo<T>(list, total));
     }
 
     /**
@@ -34,11 +31,7 @@ public final class PageResultUtils {
      *
      * @param page 分页对象
      */
-    public static <T> PageResponse<T> build(IPage<T> page) {
-        PageResponse<T> pageResponse = new PageResponse<>();
-        pageResponse.setCode(ErrorCodeEnum.SUCCESS.getCode());
-        pageResponse.setMessage(ErrorCodeEnum.SUCCESS.getMessage());
-        pageResponse.setData(new PageResponse.PageInfo<>(page.getRecords(), page.getTotal()));
-        return pageResponse;
+    public static <T> BaseResponse<PageInfo<T>> build(IPage<T> page) {
+        return BaseResultUtils.successOfData(new PageInfo<T>(page.getRecords(), page.getTotal()));
     }
 }

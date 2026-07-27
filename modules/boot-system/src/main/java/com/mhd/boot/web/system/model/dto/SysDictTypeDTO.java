@@ -3,13 +3,11 @@ package com.mhd.boot.web.system.model.dto;
 import com.mhd.boot.web.system.entity.SysDictType;
 import io.github.linpeilie.annotations.AutoMapper;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * 字典类型业务对象

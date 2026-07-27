@@ -1,8 +1,8 @@
 package com.mhd.boot.web.system.controller;
 
 import com.baomidou.lock.annotation.Lock4j;
+import com.mhd.boot.common.mybatis.core.domain.PageInfo;
 import com.mhd.boot.common.mybatis.core.domain.PageParam;
-import com.mhd.boot.common.mybatis.core.domain.PageResponse;
 import com.mhd.boot.common.operatelog.core.annotation.OperateLog;
 import com.mhd.boot.common.operatelog.core.enums.OperateTypeEnum;
 import com.mhd.boot.common.respnsedata.BaseResponse;
@@ -26,10 +26,10 @@ public class SysOperLogController extends BaseController {
     private final SysOperLogService operLogService;
 
     /**
-     * 获取操作日志记录列表
+     * 分页获取操作日志记录列表
      */
-    @GetMapping("/list")
-    public PageResponse<SysOperLogVo> list(SysOperLogDTO operLog, PageParam pageParam) {
+    @GetMapping("/page")
+    public BaseResponse<PageInfo<SysOperLogVo>> page(SysOperLogDTO operLog, PageParam pageParam) {
         return operLogService.selectPageOperLogList(operLog, pageParam);
     }
 

@@ -1,7 +1,8 @@
 package com.mhd.boot.web.system.service;
 
+import com.mhd.boot.common.mybatis.core.domain.PageInfo;
 import com.mhd.boot.common.mybatis.core.domain.PageParam;
-import com.mhd.boot.common.mybatis.core.domain.PageResponse;
+import com.mhd.boot.common.respnsedata.BaseResponse;
 import com.mhd.boot.web.system.model.dto.SysNoticeDTO;
 import com.mhd.boot.web.system.model.vo.SysNoticeVo;
 
@@ -16,11 +17,11 @@ public interface SysNoticeService {
     /**
      * 分页查询通知公告列表
      *
-     * @param dto    查询条件
+     * @param dto       查询条件
      * @param pageParam 分页参数
      * @return 通知公告分页列表
      */
-    PageResponse<SysNoticeVo> selectPageNoticeList(SysNoticeDTO dto, PageParam pageParam);
+    BaseResponse<PageInfo<SysNoticeVo>> selectPageNoticeList(SysNoticeDTO dto, PageParam pageParam);
 
     /**
      * 查询公告列表

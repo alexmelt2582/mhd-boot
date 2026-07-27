@@ -1,8 +1,8 @@
 package com.mhd.boot.web.system.controller;
 
 import com.mhd.boot.common.idempotent.annotation.RepeatSubmit;
+import com.mhd.boot.common.mybatis.core.domain.PageInfo;
 import com.mhd.boot.common.mybatis.core.domain.PageParam;
-import com.mhd.boot.common.mybatis.core.domain.PageResponse;
 import com.mhd.boot.common.operatelog.core.annotation.OperateLog;
 import com.mhd.boot.common.operatelog.core.enums.OperateTypeEnum;
 import com.mhd.boot.common.respnsedata.BaseResponse;
@@ -29,10 +29,10 @@ public class SysNoticeController extends BaseController {
     private final DictService dictService;
 
     /**
-     * 获取通知公告列表
+     * 分页获取通知公告列表
      */
-    @GetMapping("/list")
-    public PageResponse<SysNoticeVo> list(SysNoticeDTO notice, PageParam pageParam) {
+    @GetMapping("/page")
+    public BaseResponse<PageInfo<SysNoticeVo>> page(SysNoticeDTO notice, PageParam pageParam) {
         return noticeService.selectPageNoticeList(notice, pageParam);
     }
 

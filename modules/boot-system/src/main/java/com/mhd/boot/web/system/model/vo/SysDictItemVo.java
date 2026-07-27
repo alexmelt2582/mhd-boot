@@ -7,7 +7,6 @@ import lombok.Data;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 /**
  * 字典数据视图对象
@@ -20,9 +19,9 @@ public class SysDictItemVo implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     /**
-     * 主键
+     * 字典数据ID
      */
-    private Long dictCode;
+    private Long dictItemId;
     /**
      * 字典排序
      */
