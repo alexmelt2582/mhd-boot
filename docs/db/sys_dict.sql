@@ -10,6 +10,8 @@ CREATE TABLE `sys_dict_type`
     `remark`      VARCHAR(500) DEFAULT NULL COMMENT '备注信息',
     PRIMARY KEY (`dict_id`),
     KEY           `idx_dict_type` (`dict_type`),
+    UNIQUE KEY `uk_dict_type` (`dict_type`),
+    KEY `idx_dict_name` (`dict_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='系统字典类型表';
 
 
@@ -29,5 +31,6 @@ CREATE TABLE `sys_dict_item`
     `update_time` DATETIME     DEFAULT NULL COMMENT '更新时间',
     `remark`      VARCHAR(500) DEFAULT NULL COMMENT '备注信息',
     PRIMARY KEY (`dict_item_id`),
-    KEY           `idx_dict_type` (`dict_type`),
+    KEY `idx_type_sort` (`dict_type`, `dict_sort`),
+    KEY `idx_dict_value` (`dict_value`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='系统字典数据表';
