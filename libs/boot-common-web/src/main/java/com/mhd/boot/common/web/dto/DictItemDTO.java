@@ -11,7 +11,7 @@ import java.io.Serializable;
  */
 @Data
 @NoArgsConstructor
-public class DictDataDTO implements Serializable {
+public class DictItemDTO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;

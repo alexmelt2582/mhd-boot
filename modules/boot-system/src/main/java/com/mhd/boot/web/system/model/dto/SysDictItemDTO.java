@@ -1,12 +1,13 @@
 package com.mhd.boot.web.system.model.dto;
 
-import com.mhd.boot.web.system.entity.SysDictData;
+import com.mhd.boot.web.system.entity.SysDictItem;
 import io.github.linpeilie.annotations.AutoMapper;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * 字典数据视图对象
@@ -14,14 +15,14 @@ import java.util.Date;
  * @author zhao-hao-dong
  */
 @Data
-@AutoMapper(target = SysDictData.class)
-public class SysDictDataDTO implements Serializable {
+@AutoMapper(target = SysDictItem.class, reverseConvertGenerate = false)
+public class SysDictItemDTO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     /**
      * 主键
      */
-    private Long dictCode;
+    private Long dictItemId;
     /**
      * 字典排序
      */
@@ -29,18 +30,25 @@ public class SysDictDataDTO implements Serializable {
     /**
      * 字典标签
      */
+    @NotBlank(message = "字典标签不能为空")
+    @Size(min = 0, max = 100, message = "字典标签长度不能超过{max}个字符")
     private String dictLabel;
     /**
      * 字典键值
      */
+    @NotBlank(message = "字典键值不能为空")
+    @Size(min = 0, max = 100, message = "字典键值长度不能超过{max}个字符")
     private String dictValue;
     /**
      * 字典类型
      */
+    @NotBlank(message = "字典类型不能为空")
+    @Size(min = 0, max = 100, message = "字典类型长度不能超过{max}个字符")
     private String dictType;
     /**
      * 样式属性（其他样式扩展）
      */
+    @Size(min = 0, max = 100, message = "样式属性长度不能超过{max}个字符")
     private String cssClass;
     /**
      * 表格回显样式
@@ -54,8 +62,4 @@ public class SysDictDataDTO implements Serializable {
      * 备注
      */
     private String remark;
-    /**
-     * 创建时间
-     */
-    private Date createTime;
 }

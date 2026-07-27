@@ -17,16 +17,16 @@ import com.mhd.boot.common.utils.MapstructUtils;
 import com.mhd.boot.common.utils.SpringUtils;
 import com.mhd.boot.common.utils.StringUtils;
 import com.mhd.boot.common.utils.collection.CollectionUtils;
-import com.mhd.boot.common.web.dto.DictDataDTO;
+import com.mhd.boot.common.web.dto.DictItemDTO;
 import com.mhd.boot.common.web.dto.DictTypeDTO;
 import com.mhd.boot.common.web.service.DictService;
 import com.mhd.boot.web.system.constant.CacheNames;
-import com.mhd.boot.web.system.entity.SysDictData;
+import com.mhd.boot.web.system.entity.SysDictItem;
 import com.mhd.boot.web.system.entity.SysDictType;
-import com.mhd.boot.web.system.mapper.SysDictDataMapper;
+import com.mhd.boot.web.system.mapper.SysDictItemMapper;
 import com.mhd.boot.web.system.mapper.SysDictTypeMapper;
 import com.mhd.boot.web.system.model.dto.SysDictTypeDTO;
-import com.mhd.boot.web.system.model.vo.SysDictDataVo;
+import com.mhd.boot.web.system.model.vo.SysDictItemVo;
 import com.mhd.boot.web.system.model.vo.SysDictTypeVo;
 import com.mhd.boot.web.system.service.SysDictTypeService;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +45,7 @@ import java.util.stream.Collectors;
 @Service
 public class SysDictTypeServiceImpl implements SysDictTypeService, DictService {
     private final SysDictTypeMapper baseMapper;
-    private final SysDictDataMapper dictDataMapper;
+    private final SysDictItemMapper dictItemMapper;
 
     @Override
     public PageResponse<SysDictTypeVo> selectPageDictTypeList(SysDictTypeDTO dto, PageParam pageParam) {
@@ -78,9 +78,9 @@ public class SysDictTypeServiceImpl implements SysDictTypeService, DictService {
 
     @Cacheable(cacheNames = CacheNames.SYS_DICT, key = "#dictType")
     @Override
-    public List<SysDictDataVo> selectDictDataByType(String dictType) {
-        List<SysDictData> dictDatas = dictDataMapper.selectDictDataByType(dictType);
-        return MapstructUtils.convert(dictDatas, SysDictDataVo.class);
+    public List<SysDictItemVo> selectDictDataByType(String dictType) {
+        List<SysDictItem> dictDatas = dictItemMapper.selectDictItemListByType(dictType);
+        return MapstructUtils.convert(dictDatas, SysDictItemVo.class);
     }
 
     @Override
@@ -100,8 +100,8 @@ public class SysDictTypeServiceImpl implements SysDictTypeService, DictService {
     public void deleteDictTypeByIds(List<Long> dictIds) {
         List<SysDictType> list = baseMapper.selectByIds(dictIds);
         list.forEach(x -> {
-            boolean assigned = dictDataMapper.exists(new LambdaQueryWrapper<SysDictData>()
-                    .eq(SysDictData::getDictType, x.getDictType()));
+            boolean assigned = dictItemMapper.exists(new LambdaQueryWrapper<SysDictItem>()
+                    .eq(SysDictItem::getDictType, x.getDictType()));
             if (assigned) {
                 throw new BusinessException("{}已分配,不能删除", x.getDictName());
             }
@@ -134,18 +134,18 @@ public class SysDictTypeServiceImpl implements SysDictTypeService, DictService {
     @CachePut(cacheNames = CacheNames.SYS_DICT, key = "#sysDictTypeDTO.dictType")
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public List<SysDictDataVo> updateDictType(SysDictTypeDTO sysDictTypeDTO) {
+    public List<SysDictItemVo> updateDictType(SysDictTypeDTO sysDictTypeDTO) {
         SysDictType dict = MapstructUtils.convert(sysDictTypeDTO, SysDictType.class);
         SysDictType oldDict = baseMapper.selectById(dict.getDictId());
-        dictDataMapper.update(null, new LambdaUpdateWrapper<SysDictData>()
-                .set(SysDictData::getDictType, dict.getDictType())
-                .eq(SysDictData::getDictType, oldDict.getDictType()));
+        dictItemMapper.update(null, new LambdaUpdateWrapper<SysDictItem>()
+                .set(SysDictItem::getDictType, dict.getDictType())
+                .eq(SysDictItem::getDictType, oldDict.getDictType()));
         int row = baseMapper.updateById(dict);
         if (row > 0) {
             CacheUtils.evict(CacheNames.SYS_DICT, oldDict.getDictType());
             CacheUtils.evict(CacheNames.SYS_DICT_TYPE, oldDict.getDictType());
-            List<SysDictData> sysDictData = dictDataMapper.selectDictDataByType(dict.getDictType());
-            return MapstructUtils.convert(sysDictData, SysDictDataVo.class);
+            List<SysDictItem> sysDictData = dictItemMapper.selectDictItemListByType(dict.getDictType());
+            return MapstructUtils.convert(sysDictData, SysDictItemVo.class);
         }
         throw new BusinessException(ErrorCodeEnum.FAIL);
     }
@@ -161,8 +161,8 @@ public class SysDictTypeServiceImpl implements SysDictTypeService, DictService {
 
     @Override
     public String getDictLabel(String dictType, String dictValue, String separator) {
-        List<SysDictDataVo> datas = SpringUtils.getAopProxy(this).selectDictDataByType(dictType);
-        Map<String, String> map = CollectionUtils.convertMap(datas, SysDictDataVo::getDictValue, SysDictDataVo::getDictLabel);
+        List<SysDictItemVo> datas = SpringUtils.getAopProxy(this).selectDictDataByType(dictType);
+        Map<String, String> map = CollectionUtils.convertMap(datas, SysDictItemVo::getDictValue, SysDictItemVo::getDictLabel);
         if (StringUtils.containsAny(dictValue, separator)) {
             return Arrays.stream(dictValue.split(separator))
                     .map(v -> map.getOrDefault(v, StringUtils.EMPTY))
@@ -174,8 +174,8 @@ public class SysDictTypeServiceImpl implements SysDictTypeService, DictService {
 
     @Override
     public String getDictValue(String dictType, String dictLabel, String separator) {
-        List<SysDictDataVo> datas = SpringUtils.getAopProxy(this).selectDictDataByType(dictType);
-        Map<String, String> map = CollectionUtils.convertMap(datas, SysDictDataVo::getDictLabel, SysDictDataVo::getDictValue);
+        List<SysDictItemVo> datas = SpringUtils.getAopProxy(this).selectDictDataByType(dictType);
+        Map<String, String> map = CollectionUtils.convertMap(datas, SysDictItemVo::getDictLabel, SysDictItemVo::getDictValue);
         if (StringUtils.containsAny(dictLabel, separator)) {
             return Arrays.stream(dictLabel.split(separator))
                     .map(l -> map.getOrDefault(l, StringUtils.EMPTY))
@@ -187,10 +187,10 @@ public class SysDictTypeServiceImpl implements SysDictTypeService, DictService {
 
     @Override
     public Map<String, String> getAllDictByDictType(String dictType) {
-        List<SysDictDataVo> list = SpringUtils.getAopProxy(this).selectDictDataByType(dictType);
+        List<SysDictItemVo> list = SpringUtils.getAopProxy(this).selectDictDataByType(dictType);
         // 保证顺序
         LinkedHashMap<String, String> map = new LinkedHashMap<>();
-        for (SysDictDataVo vo : list) {
+        for (SysDictItemVo vo : list) {
             map.put(vo.getDictValue(), vo.getDictLabel());
         }
         return map;
@@ -203,8 +203,8 @@ public class SysDictTypeServiceImpl implements SysDictTypeService, DictService {
     }
 
     @Override
-    public List<DictDataDTO> getDictData(String dictType) {
-        List<SysDictDataVo> list = SpringUtils.getAopProxy(this).selectDictDataByType(dictType);
-        return BeanUtil.copyToList(list, DictDataDTO.class);
+    public List<DictItemDTO> getDictItem(String dictType) {
+        List<SysDictItemVo> list = SpringUtils.getAopProxy(this).selectDictDataByType(dictType);
+        return BeanUtil.copyToList(list, DictItemDTO.class);
     }
 }

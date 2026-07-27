@@ -1,6 +1,6 @@
 package com.mhd.boot.web.system.model.vo;
 
-import com.mhd.boot.web.system.entity.SysDictData;
+import com.mhd.boot.web.system.entity.SysDictItem;
 import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
 
@@ -14,8 +14,8 @@ import java.util.Date;
  * @author zhao-hao-dong
  */
 @Data
-@AutoMapper(target = SysDictData.class)
-public class SysDictDataVo implements Serializable {
+@AutoMapper(target = SysDictItem.class)
+public class SysDictItemVo implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     /**

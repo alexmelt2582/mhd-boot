@@ -14,13 +14,13 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName("sys_dict_data")
-public class SysDictData extends BaseEntity {
+@TableName("sys_dict_item")
+public class SysDictItem extends BaseEntity {
     /**
      * 字典编码
      */
-    @TableId(value = "dict_code")
-    private Long dictCode;
+    @TableId(value = "dict_item_id")
+    private Long dictItemId;
     /**
      * 字典排序
      */

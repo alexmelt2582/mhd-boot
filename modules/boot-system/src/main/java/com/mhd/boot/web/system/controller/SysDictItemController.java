@@ -8,9 +8,9 @@ import com.mhd.boot.common.operatelog.core.annotation.OperateLog;
 import com.mhd.boot.common.operatelog.core.enums.OperateTypeEnum;
 import com.mhd.boot.common.respnsedata.BaseResponse;
 import com.mhd.boot.common.respnsedata.BaseResultUtils;
-import com.mhd.boot.web.system.model.dto.SysDictDataDTO;
-import com.mhd.boot.web.system.model.vo.SysDictDataVo;
-import com.mhd.boot.web.system.service.SysDictDataService;
+import com.mhd.boot.web.system.model.dto.SysDictItemDTO;
+import com.mhd.boot.web.system.model.vo.SysDictItemVo;
+import com.mhd.boot.web.system.service.SysDictItemService;
 import com.mhd.boot.web.system.service.SysDictTypeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -28,27 +28,27 @@ import java.util.List;
 @Validated
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/system/dict/data")
-public class SysDictDataController {
+@RequestMapping("/system/dict/item")
+public class SysDictItemController {
     private final SysDictTypeService dictTypeService;
-    private final SysDictDataService dictDataService;
+    private final SysDictItemService dictDataService;
 
     /**
      * 查询字典数据列表
      */
     @GetMapping("/list")
-    public PageResponse<SysDictDataVo> list(SysDictDataDTO dictData, PageParam pageParam) {
-        return dictDataService.selectPageDictDataList(dictData, pageParam);
+    public PageResponse<SysDictItemVo> list(SysDictItemDTO sysDictItemDTO, PageParam pageParam) {
+        return dictDataService.selectPageDictItemList(sysDictItemDTO, pageParam);
     }
 
     /**
      * 查询字典数据详细
      *
-     * @param dictCode 字典code
+     * @param dictItemId 字典数据ID
      */
-    @GetMapping(value = "/{dictCode}")
-    public BaseResponse<SysDictDataVo> getInfo(@PathVariable Long dictCode) {
-        return BaseResultUtils.successOfData(dictDataService.selectDictDataById(dictCode));
+    @GetMapping(value = "/{dictItemId}")
+    public BaseResponse<SysDictItemVo> getInfo(@PathVariable Long dictItemId) {
+        return BaseResultUtils.successOfData(dictDataService.selectDictItemById(dictItemId));
     }
 
     /**
@@ -57,8 +57,8 @@ public class SysDictDataController {
      * @param dictType 字典类型
      */
     @GetMapping(value = "/type/{dictType}")
-    public BaseResponse<List<SysDictDataVo>> dictType(@PathVariable String dictType) {
-        List<SysDictDataVo> data = dictTypeService.selectDictDataByType(dictType);
+    public BaseResponse<List<SysDictItemVo>> dictType(@PathVariable String dictType) {
+        List<SysDictItemVo> data = dictTypeService.selectDictDataByType(dictType);
         if (ObjectUtil.isNull(data)) {
             data = new ArrayList<>();
         }
@@ -66,42 +66,42 @@ public class SysDictDataController {
     }
 
     /**
-     * 新增字典类型
+     * 新增字典数据
      */
     @OperateLog(module = "字典数据", type = OperateTypeEnum.CREATE)
     @RepeatSubmit()
     @PostMapping
-    public BaseResponse<Void> add(@Validated @RequestBody SysDictDataDTO dict) {
-        if (!dictDataService.checkDictDataUnique(dict)) {
-            return BaseResultUtils.error("新增字典数据'" + dict.getDictValue() + "'失败，字典键值已存在");
+    public BaseResponse<Void> add(@Validated @RequestBody SysDictItemDTO dto) {
+        if (!dictDataService.checkDictItemUnique(dto)) {
+            return BaseResultUtils.error("新增字典数据'" + dto.getDictValue() + "'失败，字典键值已存在");
         }
-        dictDataService.insertDictData(dict);
+        dictDataService.insertDictItem(dto);
         return BaseResultUtils.success();
     }
 
     /**
-     * 修改保存字典类型
+     * 修改保存字典数据
      */
     @OperateLog(module = "字典数据", type = OperateTypeEnum.UPDATE)
     @RepeatSubmit()
     @PutMapping
-    public BaseResponse<Void> edit(@Validated @RequestBody SysDictDataDTO dict) {
-        if (!dictDataService.checkDictDataUnique(dict)) {
-            return BaseResultUtils.error("修改字典数据'" + dict.getDictValue() + "'失败，字典键值已存在");
+    public BaseResponse<Void> edit(@Validated @RequestBody SysDictItemDTO dto) {
+        if (!dictDataService.checkDictItemUnique(dto)) {
+            return BaseResultUtils.error("修改字典数据'" + dto.getDictValue() + "'失败，字典键值已存在");
         }
-        dictDataService.updateDictData(dict);
+        dictDataService.updateDictItem(dto);
         return BaseResultUtils.success();
     }
 
     /**
-     * 删除字典类型
+     * 删除字典数据
      *
-     * @param dictCodes 字典code串
+     * @param dictItemIds 字典数据ID数组
      */
     @OperateLog(module = "字典数据", type = OperateTypeEnum.DELETE)
-    @DeleteMapping("/{dictCodes}")
-    public BaseResponse<Void> remove(@PathVariable Long[] dictCodes) {
-        dictDataService.deleteDictDataByIds(Arrays.asList(dictCodes));
+    @DeleteMapping("/{dictItemIds}")
+    public BaseResponse<Void> remove(@PathVariable Long[] dictItemIds) {
+        dictDataService.deleteDictItemByIds(Arrays.asList(dictItemIds));
         return BaseResultUtils.success();
     }
 }

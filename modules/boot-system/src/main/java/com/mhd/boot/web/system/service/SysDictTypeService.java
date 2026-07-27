@@ -2,9 +2,8 @@ package com.mhd.boot.web.system.service;
 
 import com.mhd.boot.common.mybatis.core.domain.PageParam;
 import com.mhd.boot.common.mybatis.core.domain.PageResponse;
-import com.mhd.boot.web.system.entity.SysDictType;
 import com.mhd.boot.web.system.model.dto.SysDictTypeDTO;
-import com.mhd.boot.web.system.model.vo.SysDictDataVo;
+import com.mhd.boot.web.system.model.vo.SysDictItemVo;
 import com.mhd.boot.web.system.model.vo.SysDictTypeVo;
 
 import java.util.List;
@@ -45,7 +44,7 @@ public interface SysDictTypeService {
      * @param dictType 字典类型
      * @return 字典数据集合信息
      */
-    List<SysDictDataVo> selectDictDataByType(String dictType);
+    List<SysDictItemVo> selectDictDataByType(String dictType);
 
     /**
      * 根据字典类型ID查询信息
@@ -89,7 +88,7 @@ public interface SysDictTypeService {
      * @param sysDictTypeDTO 字典类型信息
      * @return 结果
      */
-    List<SysDictDataVo> updateDictType(SysDictTypeDTO sysDictTypeDTO);
+    List<SysDictItemVo> updateDictType(SysDictTypeDTO sysDictTypeDTO);
 
     /**
      * 校验字典类型称是否唯一

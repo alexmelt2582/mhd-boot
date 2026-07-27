@@ -1,6 +1,6 @@
 package com.mhd.boot.common.web.service;
 
-import com.mhd.boot.common.web.dto.DictDataDTO;
+import com.mhd.boot.common.web.dto.DictItemDTO;
 import com.mhd.boot.common.web.dto.DictTypeDTO;
 
 import java.util.List;
@@ -79,5 +79,5 @@ public interface DictService {
      * @param dictType 字典类型
      * @return 字典数据列表
      */
-    List<DictDataDTO> getDictData(String dictType);
+    List<DictItemDTO> getDictItem(String dictType);
 }
