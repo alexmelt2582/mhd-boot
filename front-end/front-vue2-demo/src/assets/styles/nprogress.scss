@@ -1,0 +1,14 @@
+/* nprogress进度条颜色配置 */
+#nprogress .bar {
+  background: var(--me-theme-color) !important;
+}
+
+#nprogress .spinner-icon {
+  border-top-color: var(--me-theme-color) !important;
+  border-left-color: var(--me-theme-color) !important;
+}
+
+#nprogress .peg {
+  box-shadow: 0 0 10px var(--me-theme-color),
+  0 0 5px var(--me-theme-color) !important;
+}

@@ -33,8 +33,12 @@ build/
 
 ### Mac OS ###
 .DS_Store
-/logs/
-/deploy/rocketmq/rocketmq-all-5.4.0-bin-release.zip
-/deploy/docker/docker-data/redis/data/
-/deploy/docker/docker-data/minio/data/
-/deploy/docker/docker-data/pgvector/data/
+
+# 忽略任意位置下的 node_modules目录
+**/node_modules/
+# 忽略任意位置 logs 目录下的所有 .log 文件
+**/logs/*.log
+# 忽略任意位置 logs 目录下的所有 .log.gz 文件
+**/logs/*.log.gz
+# 忽略 docker数据下的所有数据
+/deploy/docker/docker-data/**/data/
