@@ -1,7 +1,8 @@
-package com.mhd.boot.common.web.service;
+package com.mhd.boot.common.service;
 
-import com.mhd.boot.common.web.dto.DictItemDTO;
-import com.mhd.boot.common.web.dto.DictTypeDTO;
+
+import com.mhd.boot.common.dto.DictItemDTO;
+import com.mhd.boot.common.dto.DictTypeDTO;
 
 import java.util.List;
 import java.util.Map;

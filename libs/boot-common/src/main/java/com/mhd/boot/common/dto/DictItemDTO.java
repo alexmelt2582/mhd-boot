@@ -1,4 +1,4 @@
-package com.mhd.boot.common.web.dto;
+package com.mhd.boot.common.dto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

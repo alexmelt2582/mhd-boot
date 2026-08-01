@@ -1,10 +1,12 @@
 package com.mhd.boot.common.utils.file;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -25,6 +27,31 @@ public class FileUtils {
      * 文件系统分隔符
      */
     public static final String FILE_SEPARATOR = FileSystems.getDefault().getSeparator();
+
+    /**
+     * 下载文件名重新编码
+     *
+     * @param response     响应对象
+     * @param realFileName 真实文件名
+     */
+    public static void setAttachmentResponseHeader(HttpServletResponse response, String realFileName) {
+        String percentEncodedFileName = percentEncode(realFileName);
+        String contentDispositionValue = "attachment; filename=%s;filename*=utf-8''%s".formatted(percentEncodedFileName, percentEncodedFileName);
+        response.addHeader("Access-Control-Expose-Headers", "Content-Disposition,download-filename");
+        response.setHeader("Content-disposition", contentDispositionValue);
+        response.setHeader("download-filename", percentEncodedFileName);
+    }
+
+    /**
+     * 百分号编码工具方法
+     *
+     * @param s 需要百分号编码的字符串
+     * @return 百分号编码后的字符串
+     */
+    public static String percentEncode(String s) {
+        String encode = URLEncoder.encode(s, StandardCharsets.UTF_8);
+        return encode.replaceAll("\\+", "%20");
+    }
 
     /**
      * 获取不带扩展名的文件名
