@@ -4,9 +4,9 @@
 `boot-common` is the foundational shared module for the repository. It provides standardized response objects, business exceptions, error codes, and common utilities for JSON/XML, files, dates, strings, collections, encryption, and ID generation.
 
 ## 2. Main Components
-- `com.mhd.boot.common.respnsedata.BaseResponse<T>`
+- `com.mhd.boot.common.responsedata.BaseResponse<T>`
   - Standard API response wrapper with `code`, `data`, and `msg`
-- `com.mhd.boot.common.respnsedata.BaseResultUtils`
+- `com.mhd.boot.common.responsedata.BaseResultUtils`
   - Factory-style helpers for success/error responses
 - `com.mhd.boot.common.exception.BusinessException`
   - Business-level runtime exception carrying a stable code
