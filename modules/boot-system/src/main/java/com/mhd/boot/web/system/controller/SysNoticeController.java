@@ -9,7 +9,7 @@ import com.mhd.boot.common.respnsedata.BaseResponse;
 import com.mhd.boot.common.respnsedata.BaseResultUtils;
 import com.mhd.boot.common.sse.utils.SseMessageUtils;
 import com.mhd.boot.common.web.core.BaseController;
-import com.mhd.boot.common.web.service.DictService;
+import com.mhd.boot.common.service.DictService;
 import com.mhd.boot.web.system.model.dto.SysNoticeDTO;
 import com.mhd.boot.web.system.model.vo.SysNoticeVo;
 import com.mhd.boot.web.system.service.SysNoticeService;

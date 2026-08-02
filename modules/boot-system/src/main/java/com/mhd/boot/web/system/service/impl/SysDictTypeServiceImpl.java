@@ -18,9 +18,9 @@ import com.mhd.boot.common.utils.MapstructUtils;
 import com.mhd.boot.common.utils.SpringUtils;
 import com.mhd.boot.common.utils.StringUtils;
 import com.mhd.boot.common.utils.collection.CollectionUtils;
-import com.mhd.boot.common.web.dto.DictItemDTO;
-import com.mhd.boot.common.web.dto.DictTypeDTO;
-import com.mhd.boot.common.web.service.DictService;
+import com.mhd.boot.common.dto.DictItemDTO;
+import com.mhd.boot.common.dto.DictTypeDTO;
+import com.mhd.boot.common.service.DictService;
 import com.mhd.boot.web.system.constant.CacheNames;
 import com.mhd.boot.web.system.entity.SysDictItem;
 import com.mhd.boot.web.system.entity.SysDictType;
@@ -31,6 +31,7 @@ import com.mhd.boot.web.system.model.vo.SysDictItemVo;
 import com.mhd.boot.web.system.model.vo.SysDictTypeVo;
 import com.mhd.boot.web.system.service.SysDictTypeService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -44,6 +45,7 @@ import java.util.stream.Collectors;
  */
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class SysDictTypeServiceImpl implements SysDictTypeService, DictService {
     private final SysDictTypeMapper baseMapper;
     private final SysDictItemMapper dictItemMapper;
@@ -112,12 +114,15 @@ public class SysDictTypeServiceImpl implements SysDictTypeService, DictService {
             CacheUtils.evict(CacheNames.SYS_DICT, x.getDictType());
             CacheUtils.evict(CacheNames.SYS_DICT_TYPE, x.getDictType());
         });
+        log.info("delete dict type success, dictIds: {}, dictTypes: {}", dictIds, CollectionUtils.convertList(list, SysDictType::getDictType));
+        log.info("delete dict type cache success, dictTypes: {}", CollectionUtils.convertList(list, SysDictType::getDictType));
     }
 
     @Override
     public void resetDictCache() {
         CacheUtils.clear(CacheNames.SYS_DICT);
         CacheUtils.clear(CacheNames.SYS_DICT_TYPE);
+        log.info("clear dict cache success");
     }
 
     @CachePut(cacheNames = CacheNames.SYS_DICT, key = "#sysDictTypeDTO.dictType")
@@ -126,6 +131,7 @@ public class SysDictTypeServiceImpl implements SysDictTypeService, DictService {
         SysDictType dict = MapstructUtils.convert(sysDictTypeDTO, SysDictType.class);
         int row = baseMapper.insert(dict);
         if (row > 0) {
+            log.info("add dictType success,dictType:{}", dict.getDictType());
             // 新增 type 下无 data 数据 返回空防止缓存穿透
             return new ArrayList<>();
         }
@@ -143,6 +149,7 @@ public class SysDictTypeServiceImpl implements SysDictTypeService, DictService {
                 .eq(SysDictItem::getDictType, oldDict.getDictType()));
         int row = baseMapper.updateById(dict);
         if (row > 0) {
+            log.info("update dictType success,dictType:{}", dict.getDictType());
             CacheUtils.evict(CacheNames.SYS_DICT, oldDict.getDictType());
             CacheUtils.evict(CacheNames.SYS_DICT_TYPE, oldDict.getDictType());
             List<SysDictItem> sysDictData = dictItemMapper.selectDictItemListByType(dict.getDictType());
