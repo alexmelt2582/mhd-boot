@@ -1,4 +1,3 @@
-// 1. 统一延迟处理
 import type {BaseResponse} from "@/utils/service.ts";
 import {RESPONSE_CODE} from "@/constants/status.ts";
 
@@ -59,40 +58,4 @@ export function paginate<T>(list: T[], pageNum?: number, pageSize?: number) {
     list: list.slice(start, end),
     total: list.length
   };
-}
-
-/**
- * 通用过滤函数
- * @param list 需要过滤的数组
- * @param query 查询条件对象
- * @param fieldMap 字段映射关系，key是查询参数的键，value是数据对象的键
- * @returns 过滤后的数组
- */
-export function filterList<T extends Record<string, any>>(
-  list: T[],
-  query: Record<string, any>,
-  fieldMap: Record<string, string>
-) {
-  return list.filter((item) => {
-    return Object.keys(fieldMap).every((queryKey) => {
-      const queryValue = query[queryKey];
-
-      // 1. 更严谨的空值判断（包含去除首尾空格后的判断）
-      if (queryValue === undefined || queryValue === null || String(queryValue).trim() === '') {
-        return true; // 跳过此项过滤
-      }
-      const itemKey = fieldMap[queryKey];
-      if (!itemKey) {
-        return true;
-      }
-      // 2. 安全地获取 item 的值，防止 TS 报错
-      const itemValue = item?.[itemKey];
-      // 3. 字符串模糊匹配（忽略大小写）
-      if (typeof itemValue === 'string') {
-        return itemValue.toLowerCase().includes(String(queryValue).toLowerCase());
-      }
-      // 4. 其他类型（如数字、布尔值）进行严格相等匹配
-      return itemValue === queryValue;
-    });
-  });
 }

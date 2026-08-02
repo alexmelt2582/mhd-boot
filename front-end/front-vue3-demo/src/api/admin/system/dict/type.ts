@@ -1,3 +1,5 @@
+import type {PageParam} from "@/utils/service.ts";
+
 /** 字典类型VO */
 export interface DictTypeVO {
   /** 字典主键 */
@@ -21,12 +23,9 @@ export interface DictTypeDTO {
 }
 
 /** 字典类型查询参数 */
-export interface DictTypeQuery {
+export interface DictTypeQuery extends PageParam{
   dictName?: string
   dictType?: string
-  status?: number
-  pageNum?: number
-  pageSize?: number
 }
 
 /** 字典数据VO */
@@ -41,8 +40,12 @@ export interface DictItemVO {
   dictType: string
   /** 排序 */
   dictSort: number
-  /** 状态 */
-  status: number
+  /** 样式属性（其他样式扩展） */
+  cssClass: string
+  /** 回显样式 */
+  listClass: string
+  /** 是否默认（Y是 N否） */
+  isDefault: string
   /** 备注 */
   remark: string
 }
@@ -54,15 +57,14 @@ export interface DictItemDTO {
   dictValue: string
   dictType: string
   dictSort?: number
-  status?: number
+  cssClass?: string
+  listClass?: string
+  isDefault?: string
   remark?: string
 }
 
 /** 字典数据查询参数 */
-export interface DictItemQuery {
+export interface DictItemQuery extends PageParam{
   dictType?: string
   dictLabel?: string
-  status?: number
-  pageNum?: number
-  pageSize?: number
 }

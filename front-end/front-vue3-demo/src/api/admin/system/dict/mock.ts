@@ -1,7 +1,14 @@
 import type {BaseResponse, PageInfo} from '@/utils/service'
-import {filterList, mockFail, mockSuccess, paginate} from "@/utils/mock.ts";
+import {mockFail, mockSuccess, paginate} from "@/utils/mock.ts";
 import {patchObject} from "@/utils/other.ts";
-import type {DictItemDTO, DictItemVO, DictTypeDTO, DictTypeQuery, DictTypeVO} from './type'
+import type {
+  DictItemDTO,
+  DictItemQuery,
+  DictItemVO,
+  DictTypeDTO,
+  DictTypeQuery,
+  DictTypeVO
+} from './type'
 
 /* ================================================================
  * 模拟数据
@@ -10,35 +17,71 @@ import type {DictItemDTO, DictItemVO, DictTypeDTO, DictTypeQuery, DictTypeVO} fr
 const dictTypeList: DictTypeVO[] = [
   {
     dictId: 1,
+    dictName: '通用状态',
+    dictType: 'sys_normal_status',
+    remark: '',
+    createTime: '2023-01-01'
+  },
+  {
+    dictId: 2,
+    dictName: '显示状态',
+    dictType: 'sys_show_status',
+    remark: '',
+    createTime: '2023-01-01'
+  },
+  {
+    dictId: 3,
+    dictName: '是否状态',
+    dictType: 'sys_yes_no',
+    remark: '',
+    createTime: '2023-01-01'
+  },
+  {
+    dictId: 4,
+    dictName: '成功失败状态',
+    dictType: 'sys_success_failure',
+    remark: '',
+    createTime: '2023-01-01'
+  },
+  {
+    dictId: 5,
+    dictName: '启用禁用状态',
+    dictType: 'sys_enable_disable',
+    remark: '',
+    createTime: '2023-01-01'
+  },
+
+  {
+    dictId: 11,
     dictName: '空间类型',
     dictType: 'space_type',
     remark: '空间类型列表',
     createTime: '2023-01-01'
   },
   {
-    dictId: 2,
+    dictId: 12,
     dictName: '区域名称',
     dictType: 'area_name',
     remark: '区域名称列表',
     createTime: '2023-01-01'
   },
-  {dictId: 3, dictName: '楼层', dictType: 'floor', remark: '楼层列表', createTime: '2023-01-01'},
+  {dictId: 13, dictName: '楼层', dictType: 'floor', remark: '楼层列表', createTime: '2023-01-01'},
   {
-    dictId: 4,
+    dictId: 14,
     dictName: '设备类型',
     dictType: 'equipment_type',
     remark: '设备类型列表',
     createTime: '2023-01-01'
   },
   {
-    dictId: 5,
+    dictId: 15,
     dictName: '违规类型',
     dictType: 'violation_type',
     remark: '违规类型列表',
     createTime: '2023-01-01'
   },
   {
-    dictId: 6,
+    dictId: 16,
     dictName: '消息类型',
     dictType: 'message_type',
     remark: '消息类型列表',
@@ -48,12 +91,122 @@ const dictTypeList: DictTypeVO[] = [
 
 const dictItemList: DictItemVO[] = [
   {
+    dictItemId: 100,
+    dictType: 'sys_normal_status',
+    dictLabel: '正常',
+    dictValue: '0',
+    dictSort: 1,
+    cssClass: '',
+    listClass: 'success',
+    isDefault: 'Y',
+    remark: '正常状态'
+  },
+  {
+    dictItemId: 101,
+    dictType: 'sys_normal_status',
+    dictLabel: '停用',
+    dictValue: '1',
+    dictSort: 2,
+    cssClass: '',
+    listClass: 'danger',
+    isDefault: 'N',
+    remark: '停用状态'
+  },
+  {
+    dictItemId: 102,
+    dictType: 'sys_show_status',
+    dictLabel: '显示',
+    dictValue: '0',
+    dictSort: 1,
+    cssClass: '',
+    listClass: 'success',
+    isDefault: 'Y',
+    remark: '显示'
+  },
+  {
+    dictItemId: 103,
+    dictType: 'sys_show_status',
+    dictLabel: '隐藏',
+    dictValue: '1',
+    dictSort: 2,
+    cssClass: '',
+    listClass: 'info',
+    isDefault: 'N',
+    remark: '隐藏'
+  },
+  {
+    dictItemId: 104,
+    dictType: 'sys_yes_no',
+    dictLabel: '是',
+    dictValue: 'Y',
+    dictSort: 1,
+    cssClass: '',
+    listClass: 'success',
+    isDefault: 'Y',
+    remark: '是'
+  },
+  {
+    dictItemId: 105,
+    dictType: 'sys_yes_no',
+    dictLabel: '否',
+    dictValue: 'N',
+    dictSort: 2,
+    cssClass: '',
+    listClass: 'danger',
+    isDefault: 'N',
+    remark: '否'
+  },
+  {
+    dictItemId: 106,
+    dictType: 'sys_success_failure',
+    dictLabel: '成功',
+    dictValue: '0',
+    dictSort: 1,
+    cssClass: '',
+    listClass: 'success',
+    isDefault: 'Y',
+    remark: '操作成功'
+  },
+  {
+    dictItemId: 107,
+    dictType: 'sys_success_failure',
+    dictLabel: '失败',
+    dictValue: '1',
+    dictSort: 2,
+    cssClass: '',
+    listClass: 'danger',
+    isDefault: 'N',
+    remark: '操作失败'
+  },
+  {
+    dictItemId: 108,
+    dictType: 'sys_enable_disable',
+    dictLabel: '启用',
+    dictValue: '0',
+    dictSort: 1,
+    cssClass: '',
+    listClass: 'success',
+    isDefault: 'Y',
+    remark: '启用状态'
+  },
+  {
+    dictItemId: 109,
+    dictType: 'sys_enable_disable',
+    dictLabel: '禁用',
+    dictValue: '1',
+    dictSort: 2,
+    cssClass: '',
+    listClass: 'danger',
+    isDefault: 'N',
+    remark: '禁用状态'
+  },
+  {
     dictItemId: 1,
     dictType: 'space_type',
     dictLabel: '座位',
     dictValue: 'SEAT',
     dictSort: 1,
-    status: 1,
+    cssClass: "", listClass: "default", isDefault: "N",
     remark: '自习座位'
   },
   {
@@ -62,7 +215,7 @@ const dictItemList: DictItemVO[] = [
     dictLabel: '研讨室',
     dictValue: 'ROOM',
     dictSort: 2,
-    status: 1,
+    cssClass: "", listClass: "default", isDefault: "N",
     remark: '小组研讨室'
   },
   {
@@ -71,7 +224,7 @@ const dictItemList: DictItemVO[] = [
     dictLabel: '安静学习区',
     dictValue: 'QUIET_ZONE',
     dictSort: 1,
-    status: 1,
+    cssClass: "", listClass: "default", isDefault: "N",
     remark: '需保持绝对安静'
   },
   {
@@ -80,7 +233,7 @@ const dictItemList: DictItemVO[] = [
     dictLabel: '电子阅览区',
     dictValue: 'DIGITAL_ZONE',
     dictSort: 2,
-    status: 1,
+    cssClass: "", listClass: "default", isDefault: "N",
     remark: '配备电脑设备'
   },
   {
@@ -89,7 +242,7 @@ const dictItemList: DictItemVO[] = [
     dictLabel: '研讨区',
     dictValue: 'DISCUSSION_ZONE',
     dictSort: 3,
-    status: 1,
+    cssClass: "", listClass: "default", isDefault: "N",
     remark: '可进行小组讨论'
   },
   {
@@ -98,7 +251,7 @@ const dictItemList: DictItemVO[] = [
     dictLabel: '多媒体区',
     dictValue: 'MEDIA_ZONE',
     dictSort: 4,
-    status: 1,
+    cssClass: "", listClass: "default", isDefault: "N",
     remark: '多媒体设备区'
   },
   {
@@ -107,7 +260,7 @@ const dictItemList: DictItemVO[] = [
     dictLabel: '休闲阅读区',
     dictValue: 'READING_ZONE',
     dictSort: 5,
-    status: 1,
+    cssClass: "", listClass: "default", isDefault: "N",
     remark: '休闲阅读空间'
   },
   {
@@ -116,7 +269,7 @@ const dictItemList: DictItemVO[] = [
     dictLabel: '1F',
     dictValue: '1F',
     dictSort: 1,
-    status: 1,
+    cssClass: "", listClass: "default", isDefault: "N",
     remark: '一楼'
   },
   {
@@ -125,7 +278,7 @@ const dictItemList: DictItemVO[] = [
     dictLabel: '2F',
     dictValue: '2F',
     dictSort: 2,
-    status: 1,
+    cssClass: "", listClass: "default", isDefault: "N",
     remark: '二楼'
   },
   {
@@ -134,7 +287,7 @@ const dictItemList: DictItemVO[] = [
     dictLabel: '3F',
     dictValue: '3F',
     dictSort: 3,
-    status: 1,
+    cssClass: "", listClass: "default", isDefault: "N",
     remark: '三楼'
   },
   {
@@ -143,7 +296,7 @@ const dictItemList: DictItemVO[] = [
     dictLabel: '4F',
     dictValue: '4F',
     dictSort: 4,
-    status: 1,
+    cssClass: "", listClass: "default", isDefault: "N",
     remark: '四楼'
   },
   {
@@ -152,7 +305,7 @@ const dictItemList: DictItemVO[] = [
     dictLabel: '投影仪',
     dictValue: 'PROJECTOR',
     dictSort: 1,
-    status: 1,
+    cssClass: "", listClass: "default", isDefault: "N",
     remark: '投影设备'
   },
   {
@@ -161,7 +314,7 @@ const dictItemList: DictItemVO[] = [
     dictLabel: '电脑',
     dictValue: 'COMPUTER',
     dictSort: 2,
-    status: 1,
+    cssClass: "", listClass: "default", isDefault: "N",
     remark: '计算机设备'
   },
   {
@@ -170,7 +323,7 @@ const dictItemList: DictItemVO[] = [
     dictLabel: '白板',
     dictValue: 'WHITEBOARD',
     dictSort: 3,
-    status: 1,
+    cssClass: "", listClass: "default", isDefault: "N",
     remark: '交互式电子白板'
   },
   {
@@ -179,7 +332,7 @@ const dictItemList: DictItemVO[] = [
     dictLabel: '网络设备',
     dictValue: 'NETWORK',
     dictSort: 4,
-    status: 1,
+    cssClass: "", listClass: "default", isDefault: "N",
     remark: '交换机/AP等网络设备'
   },
   {
@@ -188,7 +341,7 @@ const dictItemList: DictItemVO[] = [
     dictLabel: '低信用分限制',
     dictValue: 'LOW_CREDIT',
     dictSort: 1,
-    status: 1,
+    cssClass: "", listClass: "default", isDefault: "N",
     remark: '信用分低于阈值自动限制'
   },
   {
@@ -197,7 +350,7 @@ const dictItemList: DictItemVO[] = [
     dictLabel: '管理员封禁',
     dictValue: 'ADMIN_BAN',
     dictSort: 2,
-    status: 1,
+    cssClass: "", listClass: "default", isDefault: "N",
     remark: '管理员手动封禁'
   },
   {
@@ -206,7 +359,7 @@ const dictItemList: DictItemVO[] = [
     dictLabel: '违规行为',
     dictValue: 'VIOLATION',
     dictSort: 3,
-    status: 1,
+    cssClass: "", listClass: "default", isDefault: "N",
     remark: '使用违规记录'
   },
   {
@@ -215,7 +368,7 @@ const dictItemList: DictItemVO[] = [
     dictLabel: '系统通知',
     dictValue: 'SYSTEM',
     dictSort: 1,
-    status: 1,
+    cssClass: "", listClass: "default", isDefault: "N",
     remark: '系统公告/维护通知'
   },
   {
@@ -224,7 +377,7 @@ const dictItemList: DictItemVO[] = [
     dictLabel: '预约消息',
     dictValue: 'RESERVATION',
     dictSort: 2,
-    status: 1,
+    cssClass: "", listClass: "default", isDefault: "N",
     remark: '预约成功/提醒/取消'
   },
   {
@@ -233,7 +386,7 @@ const dictItemList: DictItemVO[] = [
     dictLabel: '信用变更',
     dictValue: 'CREDIT',
     dictSort: 3,
-    status: 1,
+    cssClass: "", listClass: "default", isDefault: "N",
     remark: '信用分增减通知'
   },
   {
@@ -242,7 +395,7 @@ const dictItemList: DictItemVO[] = [
     dictLabel: '违规提醒',
     dictValue: 'VIOLATION',
     dictSort: 4,
-    status: 1,
+    cssClass: "", listClass: "default", isDefault: "N",
     remark: '违规警告/处理通知'
   },
 ]
@@ -257,14 +410,16 @@ export async function mockGetAllDicts(): Promise<BaseResponse<DictTypeVO[]>> {
 }
 
 export async function mockPageDictTypes(query: DictTypeQuery): Promise<BaseResponse<PageInfo<DictTypeVO>>> {
-  // 定义查询参数和数据字段的映射关系
-  const fieldMap = {
-    dictName: 'dictName',
-    dictType: 'dictType',
-  };
-  // 先过滤，再分页
-  const filteredList = filterList(dictTypeList, query, fieldMap);
-  const pageInfo = paginate(filteredList, query.pageNum, query.pageSize);
+  // 1. 过滤
+  let filteredList = [...dictTypeList];
+  if (query.dictName) {
+    filteredList = filteredList.filter((item) => item.dictName.includes(query.dictName!));
+  }
+  if (query.dictType) {
+    filteredList = filteredList.filter((item) => item.dictType.includes(query.dictType!));
+  }
+  // 2. 分页
+  const pageInfo = paginate(filteredList, query.pageNo, query.pageSize);
   return mockSuccess(pageInfo);
 }
 
@@ -314,14 +469,17 @@ export async function mockGetDictByType(dictType: string): Promise<BaseResponse<
   return mockSuccess(items)
 }
 
-export async function mockPageDictItems(query: any): Promise<BaseResponse<PageInfo<DictItemVO>>> {
-  const fieldMap = {
-    dictType: 'dictType',
-    dictLabel: 'dictLabel',
-    status: 'status', // 数字类型会进行严格相等匹配
-  };
-  const filteredList = filterList(dictItemList, query, fieldMap);
-  const pageInfo = paginate(filteredList, query.pageNum, query.pageSize);
+export async function mockPageDictItems(query: DictItemQuery): Promise<BaseResponse<PageInfo<DictItemVO>>> {
+  // 1. 过滤
+  let filteredList = [...dictItemList];
+  if (query.dictLabel) {
+    filteredList = filteredList.filter((item) => item.dictLabel.includes(query.dictLabel!));
+  }
+  if (query.dictType) {
+    filteredList = filteredList.filter((item) => item.dictType.includes(query.dictType!));
+  }
+  // 2. 分页
+  const pageInfo = paginate(filteredList, query.pageNo, query.pageSize);
   return mockSuccess(pageInfo);
 }
 
@@ -341,7 +499,9 @@ export async function mockAddDictItem(data: DictItemDTO): Promise<BaseResponse<n
     dictLabel: data.dictLabel,
     dictValue: data.dictValue,
     dictSort: data.dictSort ?? 99,
-    status: data.status ?? 1,
+    cssClass: data.cssClass ?? '',
+    listClass: data.listClass ?? '',
+    isDefault: data.isDefault ?? 'N',
     remark: data.remark || '',
   })
   return mockSuccess(null, '新增成功')
