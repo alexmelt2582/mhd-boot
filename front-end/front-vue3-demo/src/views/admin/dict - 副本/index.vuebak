@@ -1,0 +1,39 @@
+<template>
+  <div class="p-4 h-[calc(100vh-100px)]">
+    <div class="flex h-full gap-4">
+      <div class="w-[400px] bg-white rounded-lg shadow-sm flex flex-col">
+        <DictTypeList
+          :active-type="activeDictType"
+          @select="handleSelectType"
+          @refresh="handleRefreshTypeList"
+          ref="dictTypeListRef"
+        />
+      </div>
+
+      <div class="flex-1 bg-white rounded-lg shadow-sm flex flex-col">
+        <DictItemPanel
+          :dict-type="activeDictType"
+          @refresh="handleRefreshTypeList"
+        />
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+import DictItemPanel from "@/views/admin/dict/components/dict-item-panel.vue";
+import DictTypeList from "@/views/admin/dict/components/dict-type-list.vue";
+import type {DictTypeVO} from "@/api/admin/system/dict/type.ts";
+
+const dictTypeListRef = ref()
+const activeDictType = ref<DictTypeVO | null>(null)
+
+const handleSelectType = (type: DictTypeVO) => {
+  activeDictType.value = type
+}
+
+const handleRefreshTypeList = () => {
+  dictTypeListRef.value?.fetchDictTypes()
+}
+</script>
