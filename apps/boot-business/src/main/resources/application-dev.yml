@@ -1,43 +1,46 @@
-# ============================================================
-# 开发环境配置
-# 说明：
-# 1. 已从 MySQL 迁移至 PostgreSQL（配合 mhd-boot 业务集成）
-# 2. 敏感信息（密码、密钥）在生产环境必须通过环境变量注入
-# ============================================================
-
 spring:
-#  threads:
-#    virtual:
-#      enabled: true  # 启用 Java 21 虚拟线程
   datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://127.0.0.1:5432/mhd_interview
-    username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:password}
-    hikari:
-      maximum-pool-size: 20
-      minimum-idle: 5
-      connection-timeout: 30000
-      idle-timeout: 600000
-      max-lifetime: 1800000
+    type: com.zaxxer.hikari.HikariDataSource
+    # 动态数据源文档 https://www.kancloud.cn/tracy5546/dynamic-datasource/content
+    dynamic:
+      # 性能分析插件(有性能损耗 不建议生产环境使用)
+      p6spy: false
+      # 设置默认的数据源或者数据源组,默认值即为 master
+      primary: master
+      # 严格模式 匹配不到数据源则报错
+      strict: true
+      datasource:
+        # 主库数据源
+        master:
+          type: ${spring.datasource.type}
+          driverClassName: com.mysql.cj.jdbc.Driver
+          # jdbc 所有参数配置参考 https://lionli.blog.csdn.net/article/details/122018562
+          # rewriteBatchedStatements=true 批处理优化 大幅提升批量插入更新删除性能(对数据库有性能损耗 使用批量操作应考虑性能问题)
+          url: jdbc:mysql://127.0.0.1:3306/ruoyi-ai?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true&rewriteBatchedStatements=true&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true
+          username: ${DB_USERNAME:root}
+          password: ${DB_PASSWORD:Z4,d.3[j}
+      #        agent:
+      #          url: jdbc:mysql://127.0.0.1:3306/test?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true&rewriteBatchedStatements=true&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true
+      #          # url: jdbc:mysql://localhost:3306/agent_db
+      #          username: root
+      #          password: root
+      #          driverClassName: com.mysql.cj.jdbc.Driver
 
-  ai:
-    openai:
-      base-url: ${AI_BASE_URL:https://dashscope.aliyuncs.com/compatible-mode}
-      api-key: ${AI_API_KEY:sk-placeholder}
-      chat:
-        options:
-          model: ${AI_MODEL:qwen-plus}
-      embedding:
-        options:
-          model: text-embedding-v3
-    vectorstore:
-      pgvector:
-        dimensions: 1024
-        distance-type: COSINE_DISTANCE
-        index-type: HNSW
-        initialize-schema: true
-
+      hikari:
+        # 最大连接池数量
+        maxPoolSize: 20
+        # 最小空闲线程数量
+        minIdle: 10
+        # 配置获取连接等待超时的时间
+        connectionTimeout: 30000
+        # 校验超时时间
+        validationTimeout: 5000
+        # 空闲连接存活最大时间，默认10分钟
+        idleTimeout: 600000
+        # 此属性控制池中连接的最长生命周期，值0表示无限生命周期，默认30分钟
+        maxLifetime: 1800000
+        # 多久检查一次连接的活性
+        keepaliveTime: 30000
   data:
     redis:
       host: ${REDIS_HOST:127.0.0.1}
@@ -56,15 +59,3 @@ mybatis-plus:
       logic-delete-field: isDeleted
       logic-delete-value: true
       logic-not-delete-value: false
-
-app:
-  ai:
-    default-provider: dashscope
-  storage:
-    endpoint: ${MINIO_ENDPOINT:http://127.0.0.1:9000}
-    access-key: ${MINIO_ACCESS_KEY:minioadmin}
-    secret-key: ${MINIO_SECRET_KEY:minioadmin}
-    bucket: ${MINIO_BUCKET:interview}
-    region: us-east-1
-  security:
-    aes-key: ${AES_KEY:interview-aes-key-2024}
