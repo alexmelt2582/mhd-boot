@@ -2,7 +2,7 @@ package com.mhd.boot.web.system.service;
 
 import com.mhd.boot.common.mybatis.core.domain.PageInfo;
 import com.mhd.boot.common.mybatis.core.domain.PageParam;
-import com.mhd.boot.common.respnsedata.BaseResponse;
+import com.mhd.boot.common.responsedata.BaseResponse;
 import com.mhd.boot.web.system.model.dto.SysDictItemDTO;
 import com.mhd.boot.web.system.model.vo.SysDictItemVo;
 

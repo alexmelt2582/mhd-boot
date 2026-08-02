@@ -9,7 +9,7 @@ import com.mhd.boot.common.mybatis.core.domain.PageResultUtils;
 import com.mhd.boot.common.mybatis.core.utils.MybatisPlusUtils;
 import com.mhd.boot.common.mybatis.core.wrapper.LambdaQueryWrapperX;
 import com.mhd.boot.common.operatelog.core.event.OperateLogEvent;
-import com.mhd.boot.common.respnsedata.BaseResponse;
+import com.mhd.boot.common.responsedata.BaseResponse;
 import com.mhd.boot.common.utils.MapstructUtils;
 import com.mhd.boot.web.system.entity.SysOperLog;
 import com.mhd.boot.web.system.mapper.SysOperLogMapper;

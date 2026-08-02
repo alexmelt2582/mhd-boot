@@ -1,5 +1,6 @@
 package com.mhd.boot.web.system.model.dto;
 
+import com.mhd.boot.common.validate.EditGroup;
 import com.mhd.boot.web.system.entity.SysNotice;
 import io.github.linpeilie.annotations.AutoMapper;
 import jakarta.validation.constraints.NotBlank;
@@ -13,10 +14,11 @@ import java.io.Serializable;
  */
 @Data
 @AutoMapper(target = SysNotice.class, reverseConvertGenerate = false)
-public class SysNoticeDTO implements Serializable {
+public class SysNoticeSaveDTO implements Serializable {
     /**
      * 公告ID
      */
+    @NotBlank(message = "公告ID不能为空", groups = {EditGroup.class})
     private Long noticeId;
 
     /**

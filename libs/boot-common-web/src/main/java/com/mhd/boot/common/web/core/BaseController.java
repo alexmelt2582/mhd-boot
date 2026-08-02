@@ -1,7 +1,7 @@
 package com.mhd.boot.common.web.core;
 
-import com.mhd.boot.common.respnsedata.BaseResponse;
-import com.mhd.boot.common.respnsedata.BaseResultUtils;
+import com.mhd.boot.common.responsedata.BaseResponse;
+import com.mhd.boot.common.responsedata.BaseResultUtils;
 import com.mhd.boot.common.utils.StringUtils;
 
 /**

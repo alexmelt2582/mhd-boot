@@ -5,14 +5,18 @@ import com.mhd.boot.common.mybatis.core.domain.PageInfo;
 import com.mhd.boot.common.mybatis.core.domain.PageParam;
 import com.mhd.boot.common.operatelog.core.annotation.OperateLog;
 import com.mhd.boot.common.operatelog.core.enums.OperateTypeEnum;
-import com.mhd.boot.common.respnsedata.BaseResponse;
-import com.mhd.boot.common.respnsedata.BaseResultUtils;
+import com.mhd.boot.common.responsedata.BaseResponse;
+import com.mhd.boot.common.responsedata.BaseResultUtils;
 import com.mhd.boot.common.sse.utils.SseMessageUtils;
+import com.mhd.boot.common.validate.AddGroup;
+import com.mhd.boot.common.validate.EditGroup;
 import com.mhd.boot.common.web.core.BaseController;
 import com.mhd.boot.common.service.DictService;
-import com.mhd.boot.web.system.model.dto.SysNoticeDTO;
+import com.mhd.boot.web.system.model.dto.SysNoticeQueryDTO;
+import com.mhd.boot.web.system.model.dto.SysNoticeSaveDTO;
 import com.mhd.boot.web.system.model.vo.SysNoticeVo;
 import com.mhd.boot.web.system.service.SysNoticeService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -32,8 +36,8 @@ public class SysNoticeController extends BaseController {
      * 分页获取通知公告列表
      */
     @GetMapping("/page")
-    public BaseResponse<PageInfo<SysNoticeVo>> page(SysNoticeDTO notice, PageParam pageParam) {
-        return noticeService.selectPageNoticeList(notice, pageParam);
+    public BaseResponse<PageInfo<SysNoticeVo>> page(@Valid SysNoticeQueryDTO queryDTO, @Valid PageParam pageParam) {
+        return noticeService.selectPageNoticeList(queryDTO, pageParam);
     }
 
     /**
@@ -52,13 +56,13 @@ public class SysNoticeController extends BaseController {
     @OperateLog(module = "通知公告", type = OperateTypeEnum.CREATE)
     @RepeatSubmit()
     @PostMapping
-    public BaseResponse<Void> add(@Validated @RequestBody SysNoticeDTO notice) {
-        int rows = noticeService.insertNotice(notice);
+    public BaseResponse<Void> add(@Validated(AddGroup.class) @RequestBody SysNoticeSaveDTO saveDTO) {
+        int rows = noticeService.insertNotice(saveDTO);
         if (rows <= 0) {
             return BaseResultUtils.error();
         }
-        String type = dictService.getDictLabel("sys_notice_type", notice.getNoticeType());
-        SseMessageUtils.publishAll("[" + type + "] " + notice.getNoticeTitle());
+        String type = dictService.getDictLabel("sys_notice_type", saveDTO.getNoticeType());
+        SseMessageUtils.publishAll("[" + type + "] " + saveDTO.getNoticeTitle());
         return BaseResultUtils.success();
     }
 
@@ -68,8 +72,8 @@ public class SysNoticeController extends BaseController {
     @OperateLog(module = "通知公告", type = OperateTypeEnum.UPDATE)
     @RepeatSubmit()
     @PutMapping
-    public BaseResponse<Void> edit(@Validated @RequestBody SysNoticeDTO notice) {
-        return toAjax(noticeService.updateNotice(notice));
+    public BaseResponse<Void> edit(@Validated(EditGroup.class) @RequestBody SysNoticeSaveDTO saveDTO) {
+        return toAjax(noticeService.updateNotice(saveDTO));
     }
 
     /**

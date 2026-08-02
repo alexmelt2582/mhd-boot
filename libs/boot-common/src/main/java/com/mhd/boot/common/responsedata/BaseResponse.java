@@ -1,4 +1,4 @@
-package com.mhd.boot.common.respnsedata;
+package com.mhd.boot.common.responsedata;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

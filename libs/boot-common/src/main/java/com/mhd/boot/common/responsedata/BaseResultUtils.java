@@ -1,4 +1,4 @@
-package com.mhd.boot.common.respnsedata;
+package com.mhd.boot.common.responsedata;
 
 
 import com.mhd.boot.common.enums.ErrorCodeEnum;

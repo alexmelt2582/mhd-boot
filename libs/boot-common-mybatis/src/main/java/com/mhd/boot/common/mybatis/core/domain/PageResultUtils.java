@@ -1,8 +1,8 @@
 package com.mhd.boot.common.mybatis.core.domain;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.mhd.boot.common.respnsedata.BaseResponse;
-import com.mhd.boot.common.respnsedata.BaseResultUtils;
+import com.mhd.boot.common.responsedata.BaseResponse;
+import com.mhd.boot.common.responsedata.BaseResultUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 

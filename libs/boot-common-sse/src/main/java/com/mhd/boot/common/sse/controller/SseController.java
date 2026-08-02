@@ -1,7 +1,7 @@
 package com.mhd.boot.common.sse.controller;
 
-import com.mhd.boot.common.respnsedata.BaseResponse;
-import com.mhd.boot.common.respnsedata.BaseResultUtils;
+import com.mhd.boot.common.responsedata.BaseResponse;
+import com.mhd.boot.common.responsedata.BaseResultUtils;
 import com.mhd.boot.common.sse.core.SseEmitterManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.DisposableBean;

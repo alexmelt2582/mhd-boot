@@ -1,8 +1,8 @@
 package com.mhd.boot.common.mybatis.core.handler;
 
 import cn.hutool.http.HttpStatus;
-import com.mhd.boot.common.respnsedata.BaseResponse;
-import com.mhd.boot.common.respnsedata.BaseResultUtils;
+import com.mhd.boot.common.responsedata.BaseResponse;
+import com.mhd.boot.common.responsedata.BaseResultUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.mybatis.spring.MyBatisSystemException;

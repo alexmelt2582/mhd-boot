@@ -7,7 +7,7 @@ import com.mhd.boot.common.enums.ErrorCodeEnum;
 import com.mhd.boot.common.exception.BusinessException;
 import com.mhd.boot.common.idempotent.annotation.RepeatSubmit;
 import com.mhd.boot.common.redis.utils.RedisUtils;
-import com.mhd.boot.common.respnsedata.BaseResponse;
+import com.mhd.boot.common.responsedata.BaseResponse;
 import com.mhd.boot.common.utils.StringUtils;
 import com.mhd.boot.common.utils.json.JsonUtils;
 import com.mhd.boot.common.utils.servlet.ServletUtils;

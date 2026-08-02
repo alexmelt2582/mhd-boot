@@ -13,7 +13,7 @@ import com.mhd.boot.common.mybatis.core.domain.PageResultUtils;
 import com.mhd.boot.common.mybatis.core.utils.MybatisPlusUtils;
 import com.mhd.boot.common.mybatis.core.wrapper.LambdaQueryWrapperX;
 import com.mhd.boot.common.redis.utils.CacheUtils;
-import com.mhd.boot.common.respnsedata.BaseResponse;
+import com.mhd.boot.common.responsedata.BaseResponse;
 import com.mhd.boot.common.utils.MapstructUtils;
 import com.mhd.boot.common.utils.SpringUtils;
 import com.mhd.boot.common.utils.StringUtils;
