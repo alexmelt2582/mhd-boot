@@ -23,6 +23,7 @@
         <module>boot-common-idempotent</module>
         <module>boot-common-redis</module>
         <module>boot-common-sse</module>
+        <module>boot-common-excel</module>
     </modules>
 
 </project>

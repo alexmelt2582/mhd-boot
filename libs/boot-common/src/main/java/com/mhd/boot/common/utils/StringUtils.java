@@ -1,12 +1,18 @@
 package com.mhd.boot.common.utils;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.StrUtil;
+import com.mhd.boot.common.constant.SignConstants;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.util.AntPathMatcher;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * 字符串工具类 继承 apache的StringUtils
@@ -74,5 +80,57 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
     public static boolean isMatch(String pattern, String url) {
         AntPathMatcher matcher = new AntPathMatcher();
         return matcher.match(pattern, url);
+    }
+
+    /**
+     * 切分字符串(分隔符默认逗号)
+     *
+     * @param str 被切分的字符串
+     * @return 分割后的数据列表
+     */
+    public static List<String> splitList(String str) {
+        return splitTo(str, Convert::toStr);
+    }
+
+    /**
+     * 切分字符串
+     *
+     * @param str       被切分的字符串
+     * @param separator 分隔符
+     * @return 分割后的数据列表
+     */
+    public static List<String> splitList(String str, String separator) {
+        return splitTo(str, separator, Convert::toStr);
+    }
+
+    /**
+     * 切分字符串自定义转换(分隔符默认逗号)
+     *
+     * @param str    被切分的字符串
+     * @param mapper 自定义转换
+     * @return 分割后的数据列表
+     */
+    public static <T> List<T> splitTo(String str, Function<? super Object, T> mapper) {
+        return splitTo(str, SignConstants.COMMA, mapper);
+    }
+
+    /**
+     * 切分字符串自定义转换
+     *
+     * @param str       被切分的字符串
+     * @param separator 分隔符
+     * @param mapper    自定义转换
+     * @return 分割后的数据列表
+     */
+    public static <T> List<T> splitTo(String str, String separator, Function<? super Object, T> mapper) {
+        if (isBlank(str)) {
+            return new ArrayList<>(0);
+        }
+        return StrUtil.split(str, separator)
+                .stream()
+                .filter(Objects::nonNull)
+                .map(mapper)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 }

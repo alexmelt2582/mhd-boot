@@ -1,6 +1,7 @@
 package com.mhd.boot.common.utils.collection;
 
 import cn.hutool.core.collection.CollUtil;
+import com.mhd.boot.common.utils.StringUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -110,5 +111,23 @@ public class CollectionUtils {
                         keyMapper,
                         valueMapper,
                         (v1, v2) -> v2));  // 保序
+    }
+
+    /**
+     * 将collection拼接
+     *
+     * @param collection 需要转化的集合
+     * @param function   拼接方法
+     * @param delimiter  拼接符
+     * @return 拼接后的list
+     */
+    public static <E> String join(Collection<E> collection, Function<E, String> function, CharSequence delimiter) {
+        if (CollUtil.isEmpty(collection)) {
+            return StringUtils.EMPTY;
+        }
+        return collection.stream()
+                .map(function)
+                .filter(Objects::nonNull)
+                .collect(Collectors.joining(delimiter));
     }
 }
