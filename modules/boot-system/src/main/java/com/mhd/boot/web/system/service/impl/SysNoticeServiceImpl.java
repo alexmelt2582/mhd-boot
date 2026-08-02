@@ -9,7 +9,6 @@ import com.mhd.boot.common.mybatis.core.utils.MybatisPlusUtils;
 import com.mhd.boot.common.mybatis.core.wrapper.LambdaQueryWrapperX;
 import com.mhd.boot.common.responsedata.BaseResponse;
 import com.mhd.boot.common.utils.MapstructUtils;
-import com.mhd.boot.web.system.entity.SysDictType;
 import com.mhd.boot.web.system.entity.SysNotice;
 import com.mhd.boot.web.system.mapper.SysNoticeMapper;
 import com.mhd.boot.web.system.model.dto.SysNoticeQueryDTO;
@@ -24,6 +23,8 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
+ * 公告 服务层实现
+ *
  * @author zhao-hao-dong
  */
 @Service

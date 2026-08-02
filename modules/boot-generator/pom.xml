@@ -5,15 +5,10 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.mhd</groupId>
-        <artifactId>mhd-boot</artifactId>
+        <artifactId>modules</artifactId>
         <version>${revision}</version>
     </parent>
 
-    <packaging>pom</packaging>
-    <artifactId>modules</artifactId>
+    <artifactId>boot-generator</artifactId>
 
-    <modules>
-        <module>boot-system</module>
-        <module>boot-generator</module>
-    </modules>
 </project>
