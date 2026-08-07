@@ -9,12 +9,16 @@ import com.mhd.generator.constant.GeneratorConstant;
  **/
 public class JavaGenerator {
     public static void main(String[] args) {
+        // TODO 执行前修改moduleName
         String url = "jdbc:mysql://127.0.0.1:3306/mhd-boot?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true";
         String username = "root";
         String password = "root";
-        String outputDir = System.getProperty("user.dir") + "/src/main/java";
-        String[] tableNames = new String[]{"hzb_notice_rule"};
+        String outputDir = "E:\\workstation\\javaProgram\\mhd-boot\\modules\\boot-alert" + "/src/main/java";
+        String moduleName = "告警规则";
+        String[] tableNames = new String[]{"hzb_alert_rule"};
         String[] tablePrefixList = new String[]{"hzb_"};
+
+
         BackendConfig config = BackendConfig.createDefault()
                 .globalConfigBuilder(globalConfigBuilder -> globalConfigBuilder
                         .author("zhao-hao-dong")
@@ -42,12 +46,12 @@ public class JavaGenerator {
                 .serviceImplBuilder(baseTemplateBuilder -> baseTemplateBuilder.enable(true))
                 .mapperBuilder(baseTemplateBuilder -> baseTemplateBuilder.enable(true))
                 .entityBuilder(baseTemplateBuilder -> baseTemplateBuilder.enable(true))
-                .xmlBuilder(baseTemplateBuilder -> baseTemplateBuilder.enable(true))
+                .xmlBuilder(baseTemplateBuilder -> baseTemplateBuilder.enable(false))
                 .queryReqDTOBuilder(baseTemplateBuilder -> baseTemplateBuilder.enable(true))
                 .saveReqDTOBuilder(baseTemplateBuilder -> baseTemplateBuilder.enable(true))
                 .voBuilder(baseTemplateBuilder -> baseTemplateBuilder.enable(true))
                 // 用户自定义上下文参数（合并时优先级高于系统值，moduleName 默认不自动推导）
-                .extraParam("moduleName", "通知规则");
+                .extraParam("moduleName", moduleName);
         new BackendGenerator(config).generate();
     }
 }

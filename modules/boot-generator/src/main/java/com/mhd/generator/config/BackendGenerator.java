@@ -13,6 +13,7 @@ import com.baomidou.mybatisplus.generator.config.po.TableField;
 import com.baomidou.mybatisplus.generator.config.po.TableInfo;
 import com.baomidou.mybatisplus.generator.config.rules.NamingStrategy;
 import com.baomidou.mybatisplus.generator.engine.FreemarkerTemplateEngine;
+import com.baomidou.mybatisplus.generator.jdbc.DatabaseMetaDataWrapper;
 import com.mhd.generator.constant.GeneratorConstant;
 import com.mhd.generator.handler.CustomMysqlTypeConvert;
 import com.mhd.generator.util.GeneratorUtils;
@@ -173,9 +174,17 @@ public class BackendGenerator {
         ctx.put("author", author);
         ctx.put("date", date);
 
+
         // ========== 2. 表元数据 ==========
         ctx.put("tableName", tableInfo.getName());
         ctx.put("tableComment", tableInfo.getComment());
+
+        String primaryKey = tableInfo.getIndexList().stream()
+                .filter(index -> "PRIMARY".equalsIgnoreCase(index.getName()))
+                .findFirst()
+                .map(DatabaseMetaDataWrapper.Index::getColumnName)
+                .orElse("id"); // 如果流为空，则返回默认值
+        ctx.put("primaryKey", StringUtils.toLowerCamelCase(primaryKey));
 
         // ---------- 3. naming（命名相关） ----------
         Map<String, Object> naming = new HashMap<>();

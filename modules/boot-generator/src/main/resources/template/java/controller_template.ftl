@@ -16,6 +16,7 @@ import ${packages.voPackage}.${naming.voName};
 import ${packages.servicePackage}.${naming.serviceName};
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -48,12 +49,12 @@ public class ${naming.controllerName} extends BaseController{
     /**
      * 根据${moduleName}编号获取详细信息
      *
-     * @param noticeId 主键ID
+     * @param ${primaryKey} 主键ID
      * @return 公告详情
      */
-    @GetMapping(value = "/{noticeId}")
-    public BaseResponse<SysNoticeVo> getInfo(@NotNull(message = "主键不能为空") @PathVariable Long noticeId) {
-        return BaseResultUtils.successOfData(${naming.serviceNameLower}.selectNoticeById(noticeId));
+    @GetMapping(value = "/{${primaryKey}}")
+    public BaseResponse<${naming.voName}> getInfo(@NotNull(message = "主键不能为空") @PathVariable Long ${primaryKey}) {
+        return BaseResultUtils.successOfData(${naming.serviceNameLower}.selectById(${primaryKey}));
     }
 
     /**

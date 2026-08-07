@@ -1,11 +1,12 @@
 package ${packages.queryDTOPackage};
 
 import lombok.Data;
+
+import java.io.Serial;
+import java.io.Serializable;
 <#list imports as imp>
 import ${imp};
 </#list>
-
-import java.io.Serializable;
 
 /**
  * ${moduleName} - QueryDTO 对象

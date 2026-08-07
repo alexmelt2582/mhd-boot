@@ -2,15 +2,11 @@ package ${packages.saveDTOPackage};
 
 import ${packages.entityPackage}.${naming.entityName};
 import lombok.Data;
-import me.project.common.util.validation.group.AddGroup;
-import me.project.common.util.validation.group.UpdateGroup;
+import java.io.Serial;
+import java.io.Serializable;
 <#list imports as imp>
 import ${imp};
 </#list>
-
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
-import java.io.Serializable;
 
 /**
  * ${moduleName} - SaveDTO 对象

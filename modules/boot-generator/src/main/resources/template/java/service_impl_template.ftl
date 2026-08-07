@@ -54,8 +54,8 @@ public class ${naming.serviceImplName} implements ${naming.serviceName} {
     }
 
     @Override
-    public ${naming.voName} selectById(Long id) {
-        ${naming.entityName} ${naming.entityNameLower} = baseMapper.selectById(id);
+    public ${naming.voName} selectById(Long ${primaryKey}) {
+        ${naming.entityName} ${naming.entityNameLower} = baseMapper.selectById(${primaryKey});
         return MapstructUtils.convert(${naming.entityNameLower}, ${naming.voName}.class);
     }
 
@@ -67,15 +67,15 @@ public class ${naming.serviceImplName} implements ${naming.serviceName} {
     }
 
     @Override
-    public int insertByDTO(${naming.saveDTOName} saveDTO) {
+    public int updateByDTO(${naming.saveDTOName} saveDTO) {
         validSaveDTO(saveDTO);
         ${naming.entityName} ${naming.entityNameLower} = MapstructUtils.convert(saveDTO, ${naming.entityName}.class);
         return baseMapper.updateById(${naming.entityNameLower});
     }
 
     @Override
-    public int deleteByIds(Long[] ids) {
-        return baseMapper.deleteByIds(Arrays.asList(ids));
+    public int deleteByIds(Long[] ${primaryKey}s) {
+        return baseMapper.deleteByIds(Arrays.asList(${primaryKey}s));
     }
 
     private void validSaveDTO(${naming.saveDTOName} saveDTO) {

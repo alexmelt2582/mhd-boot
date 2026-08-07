@@ -35,10 +35,10 @@ public interface ${naming.serviceName} {
     /**
      * 查询${moduleName}
      *
-     * @param id ID
+     * @param ${primaryKey} ID
      * @return ${moduleName}
      */
-    ${naming.voName} selectById(Long id);
+    ${naming.voName} selectById(Long ${primaryKey});
 
     /**
      * 新增${moduleName}
@@ -59,8 +59,8 @@ public interface ${naming.serviceName} {
     /**
      * 批量删除${moduleName}
      *
-     * @param ids 需要删除的ID串
+     * @param ${primaryKey}s 需要删除的ID串
      * @return 结果
      */
-    int deleteByIds(Long[] ids);
+    int deleteByIds(Long[] ${primaryKey}s);
 }
