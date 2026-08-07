@@ -1,4 +1,4 @@
-package ${package};
+package ${packages.controllerPackage};
 
 import com.mhd.boot.common.idempotent.annotation.RepeatSubmit;
 import com.mhd.boot.common.mybatis.core.domain.PageInfo;
@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
  * @author ${author}
  */
 @RestController
-@RequestMapping("/api/${entityToLower}")
+@RequestMapping("/api/${naming.entityNameLower}")
 @Validated
 @RequiredArgsConstructor
 public class ${naming.controllerName} extends BaseController{
