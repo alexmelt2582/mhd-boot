@@ -1,12 +1,12 @@
-package ${package};
+package ${packages.mapperPackage};
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import ${packageEntity};
+import ${packages.entityPackage}.${naming.entityName};
 
 /**
+ * ${moduleName} - 数据层
+ *
  * @author ${author}
- * @since ${date}
  */
-public interface ${mapper} extends BaseMapper<${entity}> {
-
+public interface ${naming.mapperName} extends BaseMapper<${naming.entityName}> {
 }

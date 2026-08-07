@@ -1,7 +1,7 @@
 package com.mhd.generator.util;
 
 import cn.hutool.core.util.StrUtil;
-import com.mhd.generator.constant.GlobalConstant;
+import com.mhd.generator.constant.GeneratorConstant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +18,7 @@ import java.util.Scanner;
  * @since 2025-04-02
  **/
 public class FileUtils {
-    private static final Logger log = LoggerFactory.getLogger(FileUtils.class + GlobalConstant.LOG_PREFIX);
+    private static final Logger log = LoggerFactory.getLogger(FileUtils.class + GeneratorConstant.LOG_PREFIX);
 
     private FileUtils() {
     }

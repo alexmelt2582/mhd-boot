@@ -1,16 +1,14 @@
 package com.mhd.generator.util;
 
 import cn.hutool.core.util.ArrayUtil;
-import com.mhd.generator.constant.GlobalConstant;
+import com.mhd.generator.constant.GeneratorConstant;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
+ * 字符串与包路径处理工具。
+ *
  * @author zhao-hao-dong
  * @since 2025-03-19
  **/
@@ -18,15 +16,22 @@ public class StringUtils {
     private StringUtils() {
     }
 
+    /**
+     * 将多个包路径片段拼接为完整包名。
+     */
     public static String resolveClassPath(String... classPaths) {
         if (ArrayUtil.isEmpty(classPaths)) {
             return "";
         }
-        return String.join(GlobalConstant.PACKAGE_CONNECT, classPaths);
+        return String.join(GeneratorConstant.PACKAGE_CONNECT, classPaths);
     }
 
+    /**
+     * 将去掉类名后的父包名转换为目录路径。
+     * 例如 com.mhd.zz.mapper.UserMapper -> com/mhd/zz/mapper
+     */
     public static String convertPackageToPath(Object packagePath) {
-        String newPackagePath = packagePath.toString().substring(0, packagePath.toString().lastIndexOf(GlobalConstant.PACKAGE_CONNECT));
+        String newPackagePath = packagePath.toString().substring(0, packagePath.toString().lastIndexOf(GeneratorConstant.PACKAGE_CONNECT));
         String[] strings = newPackagePath.split("\\.");
         Path tmpPath = null;
         for (int i = 0; i < strings.length; i++) {
@@ -41,34 +46,8 @@ public class StringUtils {
     }
 
     /**
-     * 从文本内容中查找${...}中的内容，忽略${r'${...}'}和${r"${...}"}
-     *
-     * @param content 文本内容
-     * @return 参数列表
-     */
-    public static Set<String> findParams(String content) {
-        Set<String> result = new HashSet<>();
-        // 匹配所有 ${...}
-        String regex = "\\$\\{[^\\}]*\\}";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(content);
-        while (matcher.find()) {
-            String match = matcher.group();
-            // 排除 ${r'${...}'} 和 ${r"${...}"}
-            if (!match.matches("\\$\\{r['\"]\\$\\{[^\\}]*\\}['\"]\\}")) {
-                String tmpParam = match.substring(2, match.length() - 1);
-                result.add(tmpParam);
-            }
-        }
-        return result;
-    }
-
-    /**
      * 将 - 或者 _ 分隔的字符串转换为大驼峰字符串
      * 例如：user_name -> UserName
-     *
-     * @param str 字符串
-     * @return 大驼峰字符串
      */
     public static String toUpperCamelCase(String str) {
         return splitAndProcessWords(str, false);
@@ -76,9 +55,6 @@ public class StringUtils {
 
     /**
      * 将字符串的首字母小写
-     *
-     * @param var 字符串
-     * @return 首字母小写的字符串
      */
     public static String toFirstLower(String var) {
         return var.substring(0, 1).toLowerCase() + var.substring(1);
@@ -87,9 +63,6 @@ public class StringUtils {
     /**
      * 将 - 或者 _ 分隔的字符串转换为小驼峰字符串
      * 例如：user_name -> userName
-     *
-     * @param str 字符串
-     * @return 小驼峰字符串
      */
     public static String toLowerCamelCase(String str) {
         return splitAndProcessWords(str, true);
@@ -118,10 +91,5 @@ public class StringUtils {
             }
         }
         return camelCaseStr.toString();
-    }
-
-    public static void main(String[] args) {
-        System.out.println(findParams("E:\\idea-workspace\\mine\\zz\\zz-code-generate\\src\\main\\resources\\template\\default_vue2_js_template.ftl"));
-        System.out.println(findParams("E:\\idea-workspace\\mine\\zz\\zz-code-generate\\src\\main\\resources\\template\\default_vue2_js_template.ftl"));
     }
 }

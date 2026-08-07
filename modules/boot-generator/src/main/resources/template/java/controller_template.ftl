@@ -1,91 +1,97 @@
 package ${package};
 
-import cn.hutool.core.bean.BeanUtil;
+import com.mhd.boot.common.idempotent.annotation.RepeatSubmit;
+import com.mhd.boot.common.mybatis.core.domain.PageInfo;
+import com.mhd.boot.common.mybatis.core.domain.PageParam;
+import com.mhd.boot.common.operatelog.core.annotation.OperateLog;
+import com.mhd.boot.common.operatelog.core.enums.OperateTypeEnum;
+import com.mhd.boot.common.responsedata.BaseResponse;
+import com.mhd.boot.common.responsedata.BaseResultUtils;
+import com.mhd.boot.common.validate.AddGroup;
+import com.mhd.boot.common.validate.EditGroup;
+import com.mhd.boot.common.web.core.BaseController;
+import ${packages.queryDTOPackage}.${naming.queryDTOName};
+import ${packages.saveDTOPackage}.${naming.saveDTOName};
+import ${packages.voPackage}.${naming.voName};
+import ${packages.servicePackage}.${naming.serviceName};
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
-import me.project.common.responsedata.*;
-import me.project.common.util.validation.group.AddGroup;
-import me.project.common.util.validation.group.UpdateGroup;
-import ${packageEntity};
-import ${packageService};
-import ${packageQueryReqDTO};
-import ${packageSaveReqDTO};
-import ${packageVO};
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
-import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import java.util.List;
-import java.util.Set;
-
 /**
+ * ${moduleName} - Controller层
+ *
  * @author ${author}
- * @since ${date}
  */
 @RestController
 @RequestMapping("/api/${entityToLower}")
 @Validated
 @RequiredArgsConstructor
-public class ${controller} {
+public class ${naming.controllerName} extends BaseController{
 
-    private final ${service} ${serviceToLower};
+    private final ${naming.serviceName} ${naming.serviceNameLower};
 
     /**
-     * 分页查询
+     * 分页查询${moduleName}列表
+     *
+     * @param queryDTO  查询条件
+     * @param pageParam 分页参数
+     * @return ${moduleName}分页结果
      */
     @GetMapping("/page")
-    public PageResponse<${vo}> page(@Valid PageParam pageParam, @Valid ${queryReqDTO} queryReqDTO) {
-        PageResponse<${entity}> ${entityToLower}List = ${serviceToLower}.meGetPage(pageParam, queryReqDTO);
-        List<${vo}> ${voToLower}List = BeanUtil.copyToList(${entityToLower}List.getList(), ${vo}.class);
-        return PageResultUtils.success(${voToLower}List, ${entityToLower}List.getTotal());
+    public BaseResponse<PageInfo<${naming.voName}>> page(@Valid ${naming.queryDTOName} queryDTO, @Valid PageParam pageParam) {
+        return ${naming.serviceNameLower}.selectPageList(queryDTO, pageParam);
     }
 
     /**
-     * 查询单个数据
+     * 根据${moduleName}编号获取详细信息
+     *
+     * @param noticeId 主键ID
+     * @return 公告详情
      */
-    @GetMapping("/get")
-    public BaseResponse<${vo}> get(@NotNull(message = "ID不能为空") Long id) {
-        ${entity} ${entityToLower} = ${serviceToLower}.meGetById(id);
-        ${vo} ${voToLower} = BeanUtil.toBean(${entityToLower}, ${vo}.class);
-        return BaseResultUtils.successOfData(${voToLower});
+    @GetMapping(value = "/{noticeId}")
+    public BaseResponse<SysNoticeVo> getInfo(@NotNull(message = "主键不能为空") @PathVariable Long noticeId) {
+        return BaseResultUtils.successOfData(${naming.serviceNameLower}.selectNoticeById(noticeId));
     }
 
     /**
-     * 新增
+     * 新增${moduleName}
+     *
+     * @param saveDTO ${moduleName}参数
+     * @return 操作结果
      */
-    @PostMapping("/create")
-    public BaseResponse<Object> create(@Validated(AddGroup.class) @RequestBody ${saveReqDTO} saveReqDTO) {
-        ${serviceToLower}.meAdd(saveReqDTO);
-        return BaseResultUtils.success();
+    @OperateLog(module = "${moduleName}", type = OperateTypeEnum.CREATE)
+    @RepeatSubmit()
+    @PostMapping
+    public BaseResponse<Void> add(@Validated(AddGroup.class) @RequestBody ${naming.saveDTOName} saveDTO) {
+        return toAjax(${naming.serviceNameLower}.insertByDTO(saveDTO));
     }
 
     /**
-     * 修改
+     * 修改${moduleName}
+     *
+     * @param saveDTO ${moduleName}参数
+     * @return 操作结果
      */
-    @PutMapping("/update")
-    public BaseResponse<Object> update(@Validated(UpdateGroup.class) @RequestBody ${saveReqDTO} saveReqDTO) {
-        ${serviceToLower}.meUpdate(saveReqDTO);
-        return BaseResultUtils.success();
+    @OperateLog(module = "${moduleName}", type = OperateTypeEnum.UPDATE)
+    @RepeatSubmit()
+    @PutMapping
+    public BaseResponse<Void> edit(@Validated(EditGroup.class) @RequestBody ${naming.saveDTOName} saveDTO) {
+        return toAjax(${naming.serviceNameLower}.updateByDTO(saveDTO));
     }
 
     /**
-     * 删除
+     * 删除${moduleName}
+     *
+     * @param noticeIds ID串
+     * @return 操作结果
      */
-    @DeleteMapping("/delete")
-    public BaseResponse<Object> delete(@NotEmpty(message = "ID不能为空") @RequestBody Set<Long> ids) {
-        ${serviceToLower}.meDel(ids);
-        return BaseResultUtils.success();
-    }
-
-    /**
-     * 查询所有列表
-     */
-    @GetMapping("/all")
-    public BaseResponse<List<${vo}>> all() {
-        List<${entity}> ${entityToLower}List = ${serviceToLower}.meGetAll();
-        List<${vo}> ${voToLower}List = BeanUtil.copyToList(${entityToLower}List, ${vo}.class);
-        return BaseResultUtils.successOfData(${voToLower}List);
+    @OperateLog(module = "${moduleName}", type = OperateTypeEnum.DELETE)
+    @DeleteMapping("/{noticeIds}")
+    public BaseResponse<Void> remove(@NotEmpty(message = "主键不能为空")
+                                         @PathVariable Long[] noticeIds) {
+        return toAjax(${naming.serviceNameLower}.deleteByIds(noticeIds));
     }
 }

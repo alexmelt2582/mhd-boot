@@ -1,4 +1,4 @@
-package com.mhd.generator.core;
+package com.mhd.generator.config;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -10,6 +10,11 @@ import lombok.ToString;
 import java.util.Map;
 
 /**
+ * 单个文件生成规格。
+ * <p>
+ * 描述一份模板文件的输出方式：是否启用、模板路径、输出目录/名称/后缀、是否覆盖以及模板参数。
+ * Vue2 与 Java 生成器均以此对象描述单个文件的生成单元。
+ *
  * @author zhao-hao-dong
  * @since 2025-03-17
  **/
@@ -52,7 +57,7 @@ public class BaseTemplate {
      * <p>
      * 提供的路径方式：
      * 1. 模板文件的绝对路径
-     * 2. 模板文件的相对路径：文件放置在 resources资源路径下，填写路径以 classpath: 开头
+     * 2. 模板文件的相对路径：文件放置在 resources 资源路径下，填写路径以 classpath: 开头
      * </p>
      */
     @NotBlank(message = "模板路径不能为空")

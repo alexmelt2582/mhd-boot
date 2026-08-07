@@ -3,8 +3,8 @@ package com.mhd.generator.util;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
-import com.mhd.generator.constant.GlobalConstant;
-import com.mhd.generator.core.BaseTemplate;
+import com.mhd.generator.constant.GeneratorConstant;
+import com.mhd.generator.config.BaseTemplate;
 import com.mhd.generator.exception.CodeGeneratorException;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
  * @since 2025-04-18
  **/
 public class GeneratorUtils {
-    private static final Logger log = LoggerFactory.getLogger(GeneratorUtils.class + GlobalConstant.LOG_PREFIX);
+    private static final Logger log = LoggerFactory.getLogger(GeneratorUtils.class + GeneratorConstant.LOG_PREFIX);
     private static final Set<String> customFilterParamList = new HashSet<>();
 
     private GeneratorUtils() {
@@ -107,18 +107,24 @@ public class GeneratorUtils {
         log.info("[{}] 模板路径: {}", logPrefix, templatePath);
         // 4. 获取配置类
         Configuration configuration = getConfiguration();
-        String filePath;
         String name;
         // 5. 判断模板类型，是相对路径还是绝对路径
-        if (templatePath.startsWith(GlobalConstant.DEFAULT_PREFIX)) {
-            String newTemplatePath = templatePath.substring(GlobalConstant.DEFAULT_PREFIX.length());
-            String[] filePathAndName = FileUtils.extractFilePathAndName(newTemplatePath);
-            filePath = filePathAndName[0];
-            name = filePathAndName[1];
-            configuration.setClassForTemplateLoading(FileUtils.class, filePath);
+        if (templatePath.startsWith(GeneratorConstant.DEFAULT_PREFIX)) {
+            // classpath 资源：通过 ClassLoader（类路径根相对）读取内容后用 StringTemplateLoader 注册，
+            // 避免 ClassTemplateLoader 的“相对 resourceClass 包”语义导致路径错位。
+            String newTemplatePath = templatePath.substring(GeneratorConstant.DEFAULT_PREFIX.length()).replace('\\', '/');
+            name = FileUtils.extractFilePathAndName(newTemplatePath)[1];
+            String content = FileUtils.readResourceAsString(newTemplatePath);
+            if (content == null) {
+                log.error("[{}] classpath 模板未找到: {}", logPrefix, newTemplatePath);
+                throw new CodeGeneratorException("classpath 模板未找到: " + newTemplatePath);
+            }
+            freemarker.cache.StringTemplateLoader stringLoader = new freemarker.cache.StringTemplateLoader();
+            stringLoader.putTemplate(name, content);
+            configuration.setTemplateLoader(stringLoader);
         } else {
             String[] filePathAndName = FileUtils.extractFilePathAndName(templatePath);
-            filePath = filePathAndName[0];
+            String filePath = filePathAndName[0];
             name = filePathAndName[1];
             try {
                 configuration.setDirectoryForTemplateLoading(new File(filePath));
@@ -135,32 +141,14 @@ public class GeneratorUtils {
             log.error("[{}] 加载模板失败 !!!", logPrefix, e);
             throw new CodeGeneratorException(e);
         }
-        // 7. 处理参数，判断参数是否符合模板要求
-        Set<String> fileParams;
-        if (templatePath.startsWith(GlobalConstant.DEFAULT_PREFIX)) {
-            fileParams = findParams(FileUtils.readResourceAsString(templatePath.replace(GlobalConstant.DEFAULT_PREFIX, "")));
-        } else {
-            fileParams = findParams(FileUtils.readAbsolutePathAsString(templatePath));
-        }
-        Set<String> templateParams = new HashSet<>(templateConfig.getParamMap().keySet());
-        Set<String> tmpParams = new HashSet<>();
-        for (String filParam : fileParams) {
-            if (!templateParams.contains(filParam)) {
-                tmpParams.add(filParam);
-            }
-        }
-        if (!tmpParams.isEmpty()) {
-            log.error("[{}] 模板参数不匹配 !!!，缺少参数: {}", logPrefix, tmpParams);
-            throw new CodeGeneratorException("模板参数不匹配");
-        }
-        // 8. 生成文件
+        // 7. 生成文件（缺失变量由 FreeMarker 渲染时直接报错）
         try {
             // 创建输出路径
             Path outputDirPath;
-            if (templateConfig.getOutputDir().startsWith(GlobalConstant.DEFAULT_PREFIX)) {
+            if (templateConfig.getOutputDir().startsWith(GeneratorConstant.DEFAULT_PREFIX)) {
                 // 获取当前项目的根目录路径
                 String projectRoot = System.getProperty("user.dir");
-                String newOutputDir = templateConfig.getOutputDir().substring(GlobalConstant.DEFAULT_PREFIX.length());
+                String newOutputDir = templateConfig.getOutputDir().substring(GeneratorConstant.DEFAULT_PREFIX.length());
                 outputDirPath = Paths.get(projectRoot + "/src/main/resources/" + newOutputDir);
             } else {
                 outputDirPath = Paths.get(templateConfig.getOutputDir());

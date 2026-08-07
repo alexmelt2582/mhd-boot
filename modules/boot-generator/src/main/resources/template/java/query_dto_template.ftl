@@ -1,20 +1,25 @@
-package ${package};
+package ${packages.queryDTOPackage};
 
 import lombok.Data;
-import me.project.common.responsedata.SortableParam;
-<#list imports as import>
-import ${import};
+<#list imports as imp>
+import ${imp};
 </#list>
 
 import java.io.Serializable;
 
 /**
+ * ${moduleName} - QueryDTO 对象
+ *
  * @author ${author}
- * @since ${date}
  */
 @Data
-public class ${queryReqDTO} extends SortableParam implements Serializable {
-<#list fields as field>
-    private ${field.type} ${field.name};
+public class ${naming.queryDTOName} implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
+<#list normalFields  as field>
+    /**
+     * ${field.comment}
+     */
+    private ${field.simpleType} ${field.name};
 </#list>
 }

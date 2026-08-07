@@ -18,7 +18,7 @@ public interface SysNoticeService {
     /**
      * 分页查询通知公告列表
      *
-     * @param queryDTO       查询条件
+     * @param queryDTO  查询条件
      * @param pageParam 分页参数
      * @return 通知公告分页列表
      */

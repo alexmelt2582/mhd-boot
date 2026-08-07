@@ -1,48 +1,66 @@
-package ${package};
+package ${packages.servicePackage};
 
-import com.baomidou.mybatisplus.extension.service.IService;
-import me.project.common.responsedata.PageParam;
-import me.project.common.responsedata.PageResponse;
-import ${packageEntity};
-import ${packageQueryReqDTO};
-import ${packageSaveReqDTO};
+import com.mhd.boot.common.mybatis.core.domain.PageInfo;
+import com.mhd.boot.common.mybatis.core.domain.PageParam;
+import com.mhd.boot.common.responsedata.BaseResponse;
+import ${packages.queryDTOPackage}.${naming.queryDTOName};
+import ${packages.saveDTOPackage}.${naming.saveDTOName};
+import ${packages.voPackage}.${naming.voName};
 
-import java.io.Serializable;
 import java.util.List;
-import java.util.Set;
 
 /**
+ * ${moduleName} - Service层
+ *
  * @author ${author}
- * @since ${date}
  */
-public interface ${service} extends IService<${entity}> {
+public interface ${naming.serviceName} {
     /**
-     * 分页查询
+     * 分页查询${moduleName}列表
+     *
+     * @param queryDTO  查询条件
+     * @param pageParam 分页参数
+     * @return ${moduleName}分页列表
      */
-    PageResponse<${entity}> meGetPage(PageParam pageParam, ${queryReqDTO} queryReqDTO);
+    BaseResponse<PageInfo<${naming.voName}>> selectPageList(${naming.queryDTOName} queryDTO, PageParam pageParam);
 
     /**
-     * 查询单个数据
+     * 查询${moduleName}列表
+     *
+     * @param queryDTO 查询条件
+     * @return ${moduleName}列表
      */
-    ${entity} meGetById(Serializable id);
+    List<${naming.voName}> selectList(${naming.queryDTOName} queryDTO);
 
     /**
-     * 新增
+     * 查询${moduleName}
+     *
+     * @param id ID
+     * @return ${moduleName}
      */
-    void meAdd(${saveReqDTO} saveReqDTO);
+    ${naming.voName} selectById(Long id);
 
     /**
-     * 修改
+     * 新增${moduleName}
+     *
+     * @param saveDTO ${moduleName}
+     * @return 结果
      */
-    void meUpdate(${saveReqDTO} saveReqDTO);
+    int insertByDTO(${naming.saveDTOName} saveDTO);
 
     /**
-     * 删除
+     * 修改${moduleName}
+     *
+     * @param saveDTO ${moduleName}
+     * @return 结果
      */
-    void meDel(Set<Long> ids);
+    int updateByDTO(${naming.saveDTOName} saveDTO);
 
     /**
-    * 查询所有数据
-    */
-    List<${entity}> meGetAll();
+     * 批量删除${moduleName}
+     *
+     * @param ids 需要删除的ID串
+     * @return 结果
+     */
+    int deleteByIds(Long[] ids);
 }
