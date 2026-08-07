@@ -15,5 +15,6 @@
     <modules>
         <module>boot-system</module>
         <module>boot-generator</module>
+        <module>boot-alert</module>
     </modules>
 </project>

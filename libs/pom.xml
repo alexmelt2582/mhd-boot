@@ -24,6 +24,7 @@
         <module>boot-common-redis</module>
         <module>boot-common-sse</module>
         <module>boot-common-excel</module>
+        <module>boot-common-remoting</module>
     </modules>
 
 </project>

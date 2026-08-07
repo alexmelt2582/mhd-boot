@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
  * @author zhao-hao-dong
  **/
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class CollectionUtils {
+public class CollectionUtils extends CollUtil{
     /**
      * 对比老、新两个列表，找出新增、未修改、删除的数据
      *
