@@ -1,7 +1,9 @@
 package ${packages.saveDTOPackage};
 
 import ${packages.entityPackage}.${naming.entityName};
+import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
+
 import java.io.Serial;
 import java.io.Serializable;
 <#list imports as imp>

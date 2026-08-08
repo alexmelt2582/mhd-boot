@@ -90,9 +90,9 @@ public class ${naming.controllerName} extends BaseController{
      * @return 操作结果
      */
     @OperateLog(module = "${moduleName}", type = OperateTypeEnum.DELETE)
-    @DeleteMapping("/{noticeIds}")
+    @DeleteMapping("/{${primaryKey}s}")
     public BaseResponse<Void> remove(@NotEmpty(message = "主键不能为空")
-                                         @PathVariable Long[] noticeIds) {
-        return toAjax(${naming.serviceNameLower}.deleteByIds(noticeIds));
+                                         @PathVariable Long[] ${primaryKey}s) {
+        return toAjax(${naming.serviceNameLower}.deleteByIds(${primaryKey}s));
     }
 }
