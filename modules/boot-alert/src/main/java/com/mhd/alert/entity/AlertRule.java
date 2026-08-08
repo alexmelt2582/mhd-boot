@@ -4,11 +4,12 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import com.mhd.boot.common.mybatis.core.domain.BaseEntity;
+import lombok.*;
+
+import java.util.Map;
+
 /**
  * <p>
  * 告警规则定义表
@@ -17,13 +18,10 @@ import lombok.ToString;
  * @author zhao-hao-dong
  * @since 2026-08-07
  */
-@Getter
-@Setter
-@ToString
+@Data
+@EqualsAndHashCode(callSuper = true)
 @TableName("hzb_alert_rule")
-public class AlertRule implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class AlertRule extends BaseEntity {
 
     /**
      * 主键ID
@@ -64,14 +62,14 @@ public class AlertRule implements Serializable {
     /**
      * 标签(JSON), 如 {"status":"success","env":"prod","priority":"critical"}
      */
-    @TableField("labels")
-    private String labels;
+    @TableField(value = "labels", typeHandler = JacksonTypeHandler.class)
+    private Map<String, String> labels;
 
     /**
      * 注解(JSON), 如 {"summary":"High CPU usage"}
      */
-    @TableField("annotations")
-    private String annotations;
+    @TableField(value = "annotations", typeHandler = JacksonTypeHandler.class)
+    private Map<String, String> annotations;
 
     /**
      * 告警内容模板, 如 Instance {{ $labels.instance }} CPU usage is {{ $value }}%
@@ -89,29 +87,5 @@ public class AlertRule implements Serializable {
      * 是否启用: 1-启用 0-禁用
      */
     @TableField("enable")
-    private Boolean enable;
-
-    /**
-     * 创建人
-     */
-    @TableField("create_by")
-    private Long createBy;
-
-    /**
-     * 创建时间
-     */
-    @TableField("create_time")
-    private LocalDateTime createTime;
-
-    /**
-     * 更新人
-     */
-    @TableField("update_by")
-    private Long updateBy;
-
-    /**
-     * 更新时间
-     */
-    @TableField("update_time")
-    private LocalDateTime updateTime;
+    private Integer enable;
 }

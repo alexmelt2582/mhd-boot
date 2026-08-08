@@ -2,7 +2,6 @@ package com.mhd.alert.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.mhd.alert.entity.AlertDefine;
 import com.mhd.alert.enums.EnableEnum;
 import com.mhd.boot.common.mybatis.core.domain.PageInfo;
 import com.mhd.boot.common.mybatis.core.domain.PageParam;

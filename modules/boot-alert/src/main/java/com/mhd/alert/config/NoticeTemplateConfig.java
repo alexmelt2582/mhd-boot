@@ -36,7 +36,7 @@ public class NoticeTemplateConfig implements CommandLineRunner {
             Resource[] resources = resolver.getResources("classpath:templates/*.*");
             for (Resource resource : resources) {
                 if (resource.getFilename() == null || (!resource.getFilename().endsWith("txt") && !resource.getFilename().endsWith("html"))) {
-                    log.warn("Ignore the template file {}.", resource.getFilename());
+                    log.warn("[Alert] Ignore the template file {}.", resource.getFilename());
                     continue;
                 }
                 total++;
@@ -48,7 +48,7 @@ public class NoticeTemplateConfig implements CommandLineRunner {
                     String name = resource.getFilename().replace(".txt", "").replace(".html", "");
                     String[] names = name.split("-");
                     if (names.length != 2) {
-                        log.warn("Ignore the template file {}.", resource.getFilename());
+                        log.warn("[Alert] Ignore the template file {}.", resource.getFilename());
                         continue;
                     }
                     int type = Integer.parseInt(names[0]);
@@ -64,14 +64,14 @@ public class NoticeTemplateConfig implements CommandLineRunner {
                     PRESET_TEMPLATE.put(template.getType(), template);
                     successCount++;
                 } catch (IOException e) {
-                    log.error(e.getMessage(), e);
-                    log.error("Ignore this template file: {}.", resource.getFilename());
+                    log.error("[Alert] Load default notice template error {}", e.getMessage(), e);
+                    log.error("[Alert] Ignore this template file: {}.", resource.getFilename());
                     failCount++;
                 }
             }
-            log.info("load default notice template. total: {}, success: {}, fail: {}", total, successCount, failCount);
+            log.info("[Alert] Load default notice template. total: {}, success: {}, fail: {}", total, successCount, failCount);
         } catch (Exception e) {
-            log.error("load default notice template error", e);
+            log.error("[Alert] Load default notice template error", e);
             throw new RuntimeException(e);
         }
     }

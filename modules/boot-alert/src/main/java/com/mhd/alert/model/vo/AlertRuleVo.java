@@ -7,6 +7,7 @@ import lombok.Data;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Map;
 
 /**
  * 通知规则 - 视图对象
@@ -45,11 +46,11 @@ public class AlertRuleVo implements Serializable {
     /**
      * 标签(JSON), 如 {"status":"success","env":"prod","priority":"critical"}
      */
-    private String labels;
+    private Map<String, String> labels;
     /**
      * 注解(JSON), 如 {"summary":"High CPU usage"}
      */
-    private String annotations;
+    private Map<String, String> annotations;
     /**
      * 告警内容模板, 如 Instance {{ $labels.instance }} CPU usage is {{ $value }}%
      */
@@ -61,7 +62,7 @@ public class AlertRuleVo implements Serializable {
     /**
      * 是否启用: 1-启用 0-禁用
      */
-    private Boolean enable;
+    private Integer enable;
     /**
      * 创建人
      */

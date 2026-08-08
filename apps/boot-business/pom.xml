@@ -16,6 +16,10 @@
             <groupId>com.mhd</groupId>
             <artifactId>boot-system</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.mhd</groupId>
+            <artifactId>boot-alert</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>

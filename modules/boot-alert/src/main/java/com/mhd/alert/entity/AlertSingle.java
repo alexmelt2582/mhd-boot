@@ -6,9 +6,12 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.mhd.boot.common.mybatis.core.domain.BaseEntity;
+import com.mhd.boot.common.utils.json.JsonUtils;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import java.util.Map;
 
@@ -19,6 +22,8 @@ import java.util.Map;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class AlertSingle extends BaseEntity {
     /**
      * 主键ID
@@ -79,4 +84,9 @@ public class AlertSingle extends BaseEntity {
      */
     @TableField(value = "end_at")
     private Long endAt;
+
+    @Override
+    public AlertSingle clone() {
+        return JsonUtils.parseObject(JsonUtils.toJsonString(this), AlertSingle.class);
+    }
 }

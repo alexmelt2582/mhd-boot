@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 /**
  * 应用启动入口
  */
-@SpringBootApplication(scanBasePackages = {"com.mhd.boot.web"})
+@SpringBootApplication(scanBasePackages = {"com.mhd"})
 @Slf4j
 public class BootApplication {
 

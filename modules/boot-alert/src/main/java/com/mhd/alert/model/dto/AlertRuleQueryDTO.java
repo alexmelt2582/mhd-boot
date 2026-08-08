@@ -58,21 +58,5 @@ public class AlertRuleQueryDTO implements Serializable {
     /**
      * 是否启用: 1-启用 0-禁用
      */
-    private Boolean enable;
-    /**
-     * 创建人
-     */
-    private Long createBy;
-    /**
-     * 创建时间
-     */
-    private LocalDateTime createTime;
-    /**
-     * 更新人
-     */
-    private Long updateBy;
-    /**
-     * 更新时间
-     */
-    private LocalDateTime updateTime;
+    private Integer enable;
 }

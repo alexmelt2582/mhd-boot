@@ -7,6 +7,7 @@ import lombok.Data;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Map;
 
 /**
  * 通知规则 - SaveDTO 对象
@@ -45,11 +46,11 @@ public class AlertRuleSaveDTO implements Serializable {
     /**
      * 标签(JSON), 如 {"status":"success","env":"prod","priority":"critical"}
      */
-    private String labels;
+    private Map<String, String> labels;
     /**
      * 注解(JSON), 如 {"summary":"High CPU usage"}
      */
-    private String annotations;
+    private Map<String, String> annotations;
     /**
      * 告警内容模板, 如 Instance {{ $labels.instance }} CPU usage is {{ $value }}%
      */
@@ -61,21 +62,5 @@ public class AlertRuleSaveDTO implements Serializable {
     /**
      * 是否启用: 1-启用 0-禁用
      */
-    private Boolean enable;
-    /**
-     * 创建人
-     */
-    private Long createBy;
-    /**
-     * 创建时间
-     */
-    private LocalDateTime createTime;
-    /**
-     * 更新人
-     */
-    private Long updateBy;
-    /**
-     * 更新时间
-     */
-    private LocalDateTime updateTime;
+    private Integer enable;
 }
