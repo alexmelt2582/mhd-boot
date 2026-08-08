@@ -118,7 +118,7 @@ public class BackendGenerator {
 
         DataSourceConfig dsc = new DataSourceConfig.Builder(
                 dbConfig.getDbUrl(), dbConfig.getDbUsername(), dbConfig.getDbPassword()
-        ).build();
+        ).typeConvertHandler(new CustomMysqlTypeConvert()).build();
 
         StrategyConfig strategy = new StrategyConfig.Builder()
                 .addInclude(dbConfig.getDbTableList())

@@ -16,7 +16,9 @@ public class CustomMysqlTypeConvert implements ITypeConvertHandler {
     @Override
     public IColumnType convert(GlobalConfig globalConfig, TypeRegistry typeRegistry, TableField.MetaInfo metaInfo) {
         // 如果是 tinyint 类型，默认转化为 Integer
-        if (metaInfo.getJdbcType().TYPE_CODE == JdbcType.TINYINT.TYPE_CODE) {
+        if (metaInfo.getJdbcType().TYPE_CODE == JdbcType.TINYINT.TYPE_CODE ||
+                metaInfo.getJdbcType().TYPE_CODE == JdbcType.SMALLINT.TYPE_CODE ||
+                metaInfo.getJdbcType().TYPE_CODE == JdbcType.BIT.TYPE_CODE) {
             return DbColumnType.INTEGER;
         }
         return typeRegistry.getColumnType(metaInfo);
