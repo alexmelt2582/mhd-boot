@@ -66,6 +66,6 @@ public class DefaultExternAlertService implements ExternAlertService {
 
     @Override
     public String supportSource() {
-        return ExtrenAlertEnum.DEFAULT.getSource();
+        return ExtrenAlertEnum.DEFAULT.getCode();
     }
 }

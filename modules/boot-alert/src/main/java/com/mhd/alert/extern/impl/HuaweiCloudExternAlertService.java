@@ -3,6 +3,7 @@ package com.mhd.alert.extern.impl;
 import cn.hutool.core.date.DateUtil;
 import com.mhd.alert.entity.AlertEvent;
 import com.mhd.alert.enums.AlertStatusEnum;
+import com.mhd.alert.enums.ExtrenAlertEnum;
 import com.mhd.alert.extern.ExternAlertService;
 import com.mhd.alert.extern.dto.HuaweiCloudExternAlert;
 import com.mhd.alert.reduce.AlarmCommonReduce;
@@ -48,7 +49,6 @@ public class HuaweiCloudExternAlertService implements ExternAlertService {
     private static final String SUBSCRIBE_URL_PREFIX = "https://console.huaweicloud.com/smn/subscription/confirm";
 
     private final AlarmCommonReduce alarmCommonReduce;
-
 
     @Override
     public void addExternAlert(String content) {
@@ -307,7 +307,7 @@ public class HuaweiCloudExternAlertService implements ExternAlertService {
 
     @Override
     public String supportSource() {
-        return "huaweicloud-ces";
+        return ExtrenAlertEnum.HUAWEICLOUD_CES.getCode();
     }
 
 
