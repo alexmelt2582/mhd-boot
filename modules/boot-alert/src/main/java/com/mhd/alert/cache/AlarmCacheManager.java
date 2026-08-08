@@ -7,6 +7,7 @@ import com.mhd.alert.entity.AlertEvent;
 import com.mhd.alert.enums.AlertStatusEnum;
 import com.mhd.alert.service.AlertEventService;
 import com.mhd.alert.utils.AlertUtils;
+import com.mhd.boot.common.utils.StringUtils;
 import com.mhd.boot.common.utils.collection.CollectionUtils;
 import org.springframework.stereotype.Component;
 
@@ -32,7 +33,7 @@ public class AlarmCacheManager {
             for (AlertEvent firingAlertEvent : firingAlertEvents) {
                 String fingerprint = AlertUtils.calculateFingerprint(firingAlertEvent.getLabels());
                 String ruleId = firingAlertEvent.getLabels().get(AlertConstants.LABEL_RULE_ID);
-                if (com.mhd.boot.common.utils.StringUtils.isBlank(ruleId)) {
+                if (StringUtils.isBlank(ruleId)) {
                     ruleId = getCustomKey(fingerprint);
                 }
                 firingAlertEvent.setId(null);
