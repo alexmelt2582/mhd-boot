@@ -13,7 +13,7 @@ public interface AlertConstants {
      */
     String LABEL_ALERT_NAME = "alertname";
     String LABEL_ALERT_MODE = "alert_mode";
-    String LABEL_DEFINE_ID = "defineid";
+    String LABEL_RULE_ID = "defineid";
     String ALERT_MODE_GROUP = "group";
     String ALERT_MODE_INDIVIDUAL = "individual";
 }

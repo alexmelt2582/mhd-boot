@@ -9,6 +9,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum AlertStatusEnum {
+    PENDING("pending", "待定"),
     FIRING("firing", "告警中"),
     RESOLVED("resolved", "已恢复");
     private final String code;

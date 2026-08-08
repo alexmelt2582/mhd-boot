@@ -19,6 +19,12 @@
         <dependency>
             <groupId>com.mhd</groupId>
             <artifactId>boot-alert</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>commons-logging</artifactId>
+                    <groupId>commons-logging</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>

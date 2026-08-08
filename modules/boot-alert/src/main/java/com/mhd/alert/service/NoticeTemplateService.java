@@ -9,5 +9,6 @@ import com.mhd.alert.entity.NoticeTemplate;
  */
 public interface NoticeTemplateService {
     NoticeTemplate selectById(Long id);
+
     NoticeTemplate getDefaultNoticeTemplateByType(Integer type);
 }

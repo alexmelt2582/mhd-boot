@@ -1,8 +1,8 @@
 package com.mhd.alert.calculate.periodic;
 
 import com.mhd.alert.constants.AlertConstants;
+import com.mhd.alert.entity.AlertEvent;
 import com.mhd.alert.entity.AlertRule;
-import com.mhd.alert.entity.AlertSingle;
 import com.mhd.alert.enums.AlertStatusEnum;
 import com.mhd.alert.enums.EnableEnum;
 import com.mhd.alert.reduce.AlarmCommonReduce;
@@ -16,7 +16,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -136,7 +135,7 @@ class LogPeriodicAlertCalculatorTest {
         calculator.calculate(individualAlertRule);
 
         // Then
-        verify(alarmCommonReduce, times(3)).reduceAndSendAlarm(any(AlertSingle.class));
+        verify(alarmCommonReduce, times(3)).reduceAndSendAlarm(any(AlertEvent.class));
         verify(alarmCommonReduce, never()).reduceAndSendAlarmGroup(any(), anyList());
     }
 
@@ -240,21 +239,21 @@ class LogPeriodicAlertCalculatorTest {
 
         // Then
         ArgumentCaptor<Map<String, String>> labelsCaptor = ArgumentCaptor.forClass(Map.class);
-        ArgumentCaptor<List<AlertSingle>> alertsCaptor = ArgumentCaptor.forClass(List.class);
+        ArgumentCaptor<List<AlertEvent>> alertsCaptor = ArgumentCaptor.forClass(List.class);
         verify(alarmCommonReduce).reduceAndSendAlarmGroup(labelsCaptor.capture(), alertsCaptor.capture());
 
         // 校验公共指纹（收敛键）
         Map<String, String> groupLabels = labelsCaptor.getValue();
         assertEquals("upload_log_error_alert", groupLabels.get(AlertConstants.LABEL_ALERT_NAME));
-        assertEquals("1", groupLabels.get(AlertConstants.LABEL_DEFINE_ID));
+        assertEquals("1", groupLabels.get(AlertConstants.LABEL_RULE_ID));
         assertEquals("2", groupLabels.get(ROWS));
         assertEquals(AlertConstants.ALERT_MODE_GROUP, groupLabels.get(AlertConstants.LABEL_ALERT_MODE));
 
         // 校验告警集合
-        List<AlertSingle> alerts = alertsCaptor.getValue();
+        List<AlertEvent> alerts = alertsCaptor.getValue();
         assertEquals(2, alerts.size());
 
-        AlertSingle first = alerts.get(0);
+        AlertEvent first = alerts.get(0);
         // 分组模式下触发次数等于整批命中数
         assertEquals(2, first.getTriggerTimes());
         assertEquals(AlertStatusEnum.FIRING.getCode(), first.getStatus());
@@ -278,10 +277,10 @@ class LogPeriodicAlertCalculatorTest {
         calculator.calculate(individualAlertRule);
 
         // Then
-        ArgumentCaptor<AlertSingle> alertCaptor = ArgumentCaptor.forClass(AlertSingle.class);
+        ArgumentCaptor<AlertEvent> alertCaptor = ArgumentCaptor.forClass(AlertEvent.class);
         verify(alarmCommonReduce).reduceAndSendAlarm(alertCaptor.capture());
 
-        AlertSingle alert = alertCaptor.getValue();
+        AlertEvent alert = alertCaptor.getValue();
         // individual 模式触发次数固定为 1
         assertEquals(1, alert.getTriggerTimes());
         assertEquals(AlertStatusEnum.FIRING.getCode(), alert.getStatus());
@@ -316,10 +315,10 @@ class LogPeriodicAlertCalculatorTest {
         calculator.calculate(groupAlertRule);
 
         // Then
-        ArgumentCaptor<List<AlertSingle>> alertsCaptor = ArgumentCaptor.forClass(List.class);
+        ArgumentCaptor<List<AlertEvent>> alertsCaptor = ArgumentCaptor.forClass(List.class);
         verify(alarmCommonReduce).reduceAndSendAlarmGroup(any(), alertsCaptor.capture());
 
-        AlertSingle alert = alertsCaptor.getValue().get(0);
+        AlertEvent alert = alertsCaptor.getValue().get(0);
         assertTrue(alert.getLabels().containsKey("severity_text"));
         // null 值的键不应出现在 labels 中
         assertTrue(!alert.getLabels().containsKey("empty_field"));

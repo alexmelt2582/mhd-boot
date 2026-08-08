@@ -37,7 +37,7 @@ public interface AlertRuleService {
      * 根据类型查询告警规则
      *
      * @param type 告警规则类型
-     * @return告警规则列表
+     * @return 告警规则列表
      */
     List<AlertRule> selectListByTypeAndEnableTrue(String type);
 

@@ -1,9 +1,9 @@
 package com.mhd.alert.controller;
 
-import com.mhd.alert.model.dto.AlertRuleQueryDTO;
-import com.mhd.alert.model.dto.AlertRuleSaveDTO;
-import com.mhd.alert.model.vo.AlertRuleVo;
-import com.mhd.alert.service.AlertRuleService;
+import com.mhd.alert.model.dto.AlertEventQueryDTO;
+import com.mhd.alert.model.dto.AlertEventSaveDTO;
+import com.mhd.alert.model.vo.AlertEventVo;
+import com.mhd.alert.service.AlertEventService;
 import com.mhd.boot.common.idempotent.annotation.RepeatSubmit;
 import com.mhd.boot.common.mybatis.core.domain.PageInfo;
 import com.mhd.boot.common.mybatis.core.domain.PageParam;
@@ -22,77 +22,77 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * 告警规则 - Controller层
+ * 告警事件 - Controller层
  *
  * @author zhao-hao-dong
  */
 @RestController
-@RequestMapping("/api/alert/rule")
+@RequestMapping("/api/alert/event")
 @Validated
 @RequiredArgsConstructor
-public class AlertRuleController extends BaseController {
+public class AlertEventController extends BaseController {
 
-    private final AlertRuleService alertRuleService;
+    private final AlertEventService alertEventService;
 
     /**
-     * 分页查询告警规则列表
+     * 分页查询告警事件列表
      *
      * @param queryDTO  查询条件
      * @param pageParam 分页参数
-     * @return 告警规则分页结果
+     * @return 告警事件分页结果
      */
     @GetMapping("/page")
-    public BaseResponse<PageInfo<AlertRuleVo>> page(@Valid AlertRuleQueryDTO queryDTO, @Valid PageParam pageParam) {
-        return alertRuleService.selectPageList(queryDTO, pageParam);
+    public BaseResponse<PageInfo<AlertEventVo>> page(@Valid AlertEventQueryDTO queryDTO, @Valid PageParam pageParam) {
+        return alertEventService.selectPageList(queryDTO, pageParam);
     }
 
     /**
-     * 根据告警规则编号获取详细信息
+     * 根据告警事件编号获取详细信息
      *
      * @param id 主键ID
      * @return 公告详情
      */
     @GetMapping(value = "/{id}")
-    public BaseResponse<AlertRuleVo> getInfo(@NotNull(message = "主键不能为空") @PathVariable Long id) {
-        return BaseResultUtils.successOfData(alertRuleService.selectById(id));
+    public BaseResponse<AlertEventVo> getInfo(@NotNull(message = "主键不能为空") @PathVariable Long id) {
+        return BaseResultUtils.successOfData(alertEventService.selectById(id));
     }
 
     /**
-     * 新增告警规则
+     * 新增告警事件
      *
-     * @param saveDTO 告警规则参数
+     * @param saveDTO 告警事件参数
      * @return 操作结果
      */
-    @OperateLog(module = "告警规则", type = OperateTypeEnum.CREATE)
+    @OperateLog(module = "告警事件", type = OperateTypeEnum.CREATE)
     @RepeatSubmit()
     @PostMapping
-    public BaseResponse<Void> add(@Validated(AddGroup.class) @RequestBody AlertRuleSaveDTO saveDTO) {
-        return toAjax(alertRuleService.insertByDTO(saveDTO));
+    public BaseResponse<Void> add(@Validated(AddGroup.class) @RequestBody AlertEventSaveDTO saveDTO) {
+        return toAjax(alertEventService.insertByDTO(saveDTO));
     }
 
     /**
-     * 修改告警规则
+     * 修改告警事件
      *
-     * @param saveDTO 告警规则参数
+     * @param saveDTO 告警事件参数
      * @return 操作结果
      */
-    @OperateLog(module = "告警规则", type = OperateTypeEnum.UPDATE)
+    @OperateLog(module = "告警事件", type = OperateTypeEnum.UPDATE)
     @RepeatSubmit()
     @PutMapping
-    public BaseResponse<Void> edit(@Validated(EditGroup.class) @RequestBody AlertRuleSaveDTO saveDTO) {
-        return toAjax(alertRuleService.updateByDTO(saveDTO));
+    public BaseResponse<Void> edit(@Validated(EditGroup.class) @RequestBody AlertEventSaveDTO saveDTO) {
+        return toAjax(alertEventService.updateByDTO(saveDTO));
     }
 
     /**
-     * 删除告警规则
+     * 删除告警事件
      *
      * @param ids ID串
      * @return 操作结果
      */
-    @OperateLog(module = "告警规则", type = OperateTypeEnum.DELETE)
+    @OperateLog(module = "告警事件", type = OperateTypeEnum.DELETE)
     @DeleteMapping("/{ids}")
     public BaseResponse<Void> remove(@NotEmpty(message = "主键不能为空")
                                      @PathVariable Long[] ids) {
-        return toAjax(alertRuleService.deleteByIds(ids));
+        return toAjax(alertEventService.deleteByIds(ids));
     }
 }

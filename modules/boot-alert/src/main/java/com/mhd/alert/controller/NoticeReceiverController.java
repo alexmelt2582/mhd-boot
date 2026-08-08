@@ -2,7 +2,6 @@ package com.mhd.alert.controller;
 
 import com.mhd.alert.entity.NoticeReceiver;
 import com.mhd.alert.service.NoticeReceiverService;
-import com.mhd.alert.service.NoticeTemplateService;
 import com.mhd.boot.common.responsedata.BaseResponse;
 import com.mhd.boot.common.responsedata.BaseResultUtils;
 import jakarta.validation.Valid;
@@ -24,6 +23,6 @@ public class NoticeReceiverController {
     @PostMapping(path = "/receiver/send-test-msg")
     public BaseResponse<Void> sendTestMsg(@Valid @RequestBody NoticeReceiver noticeReceiver) {
         boolean sendFlag = noticeReceiverService.sendTestMsg(noticeReceiver);
-        return sendFlag? BaseResultUtils.success(): BaseResultUtils.error("通知服务发送失败，请检查配置是否正确");
+        return sendFlag ? BaseResultUtils.success() : BaseResultUtils.error("通知服务发送失败，请检查配置是否正确");
     }
 }

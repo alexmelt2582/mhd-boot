@@ -2,8 +2,8 @@ package com.mhd.alert.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.mhd.alert.cache.AlertCacheFactory;
+import com.mhd.alert.entity.AlertEvent;
 import com.mhd.alert.entity.AlertGroup;
-import com.mhd.alert.entity.AlertSingle;
 import com.mhd.alert.entity.NoticeRule;
 import com.mhd.alert.enums.MatchSpecificLabelEnum;
 import com.mhd.alert.mapper.NoticeRuleMapper;
@@ -50,9 +50,9 @@ public class NoticeRuleServiceImpl extends ServiceImpl<NoticeRuleMapper, NoticeR
                     // 如果规则设置标签过滤”，则需要检查告警的标签是否匹配
                     if (rule.getMatchSpecificLabel() == MatchSpecificLabelEnum.MATCH_SPECIFIC.getCode()) {
                         if (rule.getLabels() != null && !rule.getLabels().isEmpty()) {
-                            List<AlertSingle> singleAlerts = alert.getAlerts();
+                            List<AlertEvent> alertEvents = alert.getAlerts();
                             // 核心逻辑：告警组中只要有任意一个子告警的标签完全匹配规则，即视为标签匹配成功
-                            boolean labelMatch = singleAlerts != null && singleAlerts.stream().anyMatch(singleAlert -> {
+                            boolean labelMatch = alertEvents != null && alertEvents.stream().anyMatch(singleAlert -> {
                                 Map<String, String> alertLabels = singleAlert.getLabels();
                                 if (alertLabels == null) {
                                     return false;

@@ -1,7 +1,7 @@
 package com.mhd.alert.mapper;
 
-import com.mhd.alert.entity.NoticeTemplate;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.mhd.alert.entity.NoticeTemplate;
 
 /**
  * 通知模板表Mapper接口

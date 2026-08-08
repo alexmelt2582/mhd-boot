@@ -9,5 +9,6 @@ import com.mhd.alert.entity.NoticeReceiver;
  */
 public interface NoticeReceiverService {
     NoticeReceiver selectById(Long id);
+
     boolean sendTestMsg(NoticeReceiver noticeReceiver);
 }

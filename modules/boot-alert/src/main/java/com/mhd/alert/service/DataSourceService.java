@@ -10,5 +10,6 @@ public interface DataSourceService {
     List<Map<String, Object>> calculate(String datasource, String expr);
 
     List<Map<String, Object>> query(String datasource, String expr);
+
     Map<String, Object> getAvailableExecutors();
 }

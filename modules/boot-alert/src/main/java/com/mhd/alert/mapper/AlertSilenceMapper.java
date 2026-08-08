@@ -1,7 +1,7 @@
 package com.mhd.alert.mapper;
 
-import com.mhd.alert.entity.AlertSilence;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.mhd.alert.entity.AlertSilence;
 
 /**
  * 告警静默策略表Mapper接口

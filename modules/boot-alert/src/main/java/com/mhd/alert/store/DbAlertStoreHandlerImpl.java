@@ -1,10 +1,11 @@
 package com.mhd.alert.store;
 
+import com.mhd.alert.entity.AlertEvent;
 import com.mhd.alert.entity.AlertGroup;
-import com.mhd.alert.entity.AlertSingle;
 import com.mhd.alert.enums.AlertStatusEnum;
+import com.mhd.alert.mapper.AlertEventMapper;
 import com.mhd.alert.mapper.AlertGroupMapper;
-import com.mhd.alert.mapper.AlertSingleMapper;
+import com.mhd.alert.service.AlertEventService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -20,7 +21,7 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class DbAlertStoreHandlerImpl implements AlertStoreHandler{
+public class DbAlertStoreHandlerImpl implements AlertStoreHandler {
     /**
      * 分段锁数量，用于按 key 分散并发写入冲突
      */
@@ -34,7 +35,8 @@ public class DbAlertStoreHandlerImpl implements AlertStoreHandler{
     /**
      * 单条告警持久化访问组件
      */
-    private final AlertSingleMapper alertSingleMapper;
+    private final AlertEventService alertEventService;
+    private final AlertEventMapper alertEventMapper;
 
     /**
      * 告警分组持久化访问组件
@@ -56,36 +58,36 @@ public class DbAlertStoreHandlerImpl implements AlertStoreHandler{
         }
 
         Set<String> alertFingerprints = new HashSet<>(8);
-        List<AlertSingle> originalAlerts = alertGroup.getAlerts();
-        List<AlertSingle> newAlerts = new ArrayList<>();
+        List<AlertEvent> originalAlerts = alertGroup.getAlerts();
+        List<AlertEvent> newAlerts = new ArrayList<>();
 
-        for (AlertSingle alertSingle : originalAlerts) {
-            synchronized (lockFor(alertSingle.getFingerprint())) {
-                AlertSingle existAlert = alertSingleMapper.selectByFingerprint(alertSingle.getFingerprint());
-                if(existAlert != null) {
-                    alertSingle.setId(existAlert.getId());
-                    alertSingle.setCreateTime(existAlert.getCreateTime());
-                    if(AlertStatusEnum.FIRING.getCode().equals(alertSingle.getStatus())) {
+        for (AlertEvent alertEvent : originalAlerts) {
+            synchronized (lockFor(alertEvent.getFingerprint())) {
+                AlertEvent existAlert = alertEventService.selectByFingerprint(alertEvent.getFingerprint());
+                if (existAlert != null) {
+                    alertEvent.setId(existAlert.getId());
+                    alertEvent.setCreateTime(existAlert.getCreateTime());
+                    if (AlertStatusEnum.FIRING.getCode().equals(alertEvent.getStatus())) {
                         // 如果当前告警状态为触发中，并且数据库中存在的告警状态不是已恢复，则更新开始时间和触发次数
                         if (!AlertStatusEnum.RESOLVED.getCode().equals(existAlert.getStatus())) {
-                            alertSingle.setStartAt(existAlert.getStartAt());
+                            alertEvent.setStartAt(existAlert.getStartAt());
                             int triggerTimes = Optional.ofNullable(existAlert.getTriggerTimes()).orElse(1)
-                                    + Optional.ofNullable(alertSingle.getTriggerTimes()).orElse(1);
-                            alertSingle.setTriggerTimes(triggerTimes);
+                                    + Optional.ofNullable(alertEvent.getTriggerTimes()).orElse(1);
+                            alertEvent.setTriggerTimes(triggerTimes);
                         }
-                    } else if (AlertStatusEnum.RESOLVED.getCode().equals(alertSingle.getStatus())) {
+                    } else if (AlertStatusEnum.RESOLVED.getCode().equals(alertEvent.getStatus())) {
                         // 如果当前告警状态为已恢复，并且数据库中存在的告警状态是触发中，则更新结束时间
                         if (AlertStatusEnum.FIRING.getCode().equals(existAlert.getStatus())) {
-                            alertSingle.setEndAt(System.currentTimeMillis());
+                            alertEvent.setEndAt(System.currentTimeMillis());
                         }
-                        alertSingle.setStartAt(existAlert.getStartAt());
-                        alertSingle.setActiveAt(existAlert.getActiveAt());
-                        alertSingle.setTriggerTimes(existAlert.getTriggerTimes());
+                        alertEvent.setStartAt(existAlert.getStartAt());
+                        alertEvent.setActiveAt(existAlert.getActiveAt());
+                        alertEvent.setTriggerTimes(existAlert.getTriggerTimes());
                     }
                 }
-                alertSingleMapper.insertOrUpdate(alertSingle);
-                newAlerts.add(alertSingle);
-                alertFingerprints.add(alertSingle.getFingerprint());
+                alertEventMapper.insertOrUpdate(alertEvent);
+                newAlerts.add(alertEvent);
+                alertFingerprints.add(alertEvent.getFingerprint());
             }
         }
         alertGroup.setAlerts(newAlerts);

@@ -1,8 +1,8 @@
 package com.mhd.alert.calculate.periodic;
 
 import com.mhd.alert.constants.AlertConstants;
+import com.mhd.alert.entity.AlertEvent;
 import com.mhd.alert.entity.AlertRule;
-import com.mhd.alert.entity.AlertSingle;
 import com.mhd.alert.enums.AlertStatusEnum;
 import com.mhd.alert.enums.EnableEnum;
 import com.mhd.alert.reduce.AlarmCommonReduce;
@@ -52,7 +52,7 @@ public class LogPeriodicAlertCalculator {
         // 1. 前置校验：规则被禁用或表达式为空时直接终止，避免无效查询
         if (Objects.equals(rule.getEnable(), EnableEnum.DISABLE.getCode()) ||
                 StringUtils.isBlank(rule.getExpr())) {
-            log.error("Alert rule {} is disabled or expression is empty", rule.getName());
+            log.error("Alert periodic log rule {} is disabled or expression is empty", rule.getName());
             return;
         }
         try {
@@ -60,7 +60,7 @@ public class LogPeriodicAlertCalculator {
             doCalculate(rule);
         } catch (Exception e) {
             // 3. 兜底捕获：单条规则异常不应影响其他规则的调度
-            log.error("Calculate periodic rule {} failed: {}", rule.getName(), e.getMessage());
+            log.error("Calculate periodic log rule {} failed: {}", rule.getName(), e.getMessage());
         }
     }
 
@@ -160,7 +160,7 @@ public class LogPeriodicAlertCalculator {
      * <ol>
      *   <li>构建告警 labels：先填充规则级公共指纹，再将命中数据上下文追加为标签；</li>
      *   <li>构建字段值映射，用于渲染告警模板与注解；</li>
-     *   <li>渲染注解与告警内容模板，组装 {@link AlertSingle}（触发次数固定为 1）；</li>
+     *   <li>渲染注解与告警内容模板，组装 {@link AlertEvent}（触发次数固定为 1）；</li>
      *   <li>克隆后交由 {@link AlarmCommonReduce} 收敛下发，避免后续修改影响已发送对象。</li>
      * </ol>
      *
@@ -182,7 +182,7 @@ public class LogPeriodicAlertCalculator {
         Map<String, Object> fieldValueMap = createFieldValueMap(context, rule);
         // 3. 渲染注解模板与告警内容，并组装告警对象
         Map<String, String> alertAnnotations = createAlertAnnotations(rule, fieldValueMap);
-        AlertSingle alert = AlertSingle.builder()
+        AlertEvent alert = AlertEvent.builder()
                 .labels(alertLabels)
                 .annotations(alertAnnotations)
                 .content(AlertTemplateUtils.render(rule.getTemplate(), fieldValueMap))
@@ -233,7 +233,7 @@ public class LogPeriodicAlertCalculator {
      */
     private void generateGroupAlert(AlertRule rule, List<Map<String, Object>> alertContext, long currentTime) {
 
-        List<AlertSingle> alerts = new ArrayList<>(alertContext.size());
+        List<AlertEvent> alerts = new ArrayList<>(alertContext.size());
 
         // 1. 构建公共指纹：含告警名、规则 ID、规则 labels，作为整组收敛键
         Map<String, String> commonFingerPrints = createCommonFingerprints(rule);
@@ -253,7 +253,7 @@ public class LogPeriodicAlertCalculator {
             // 构建字段值映射并渲染注解与内容模板
             Map<String, Object> fieldValueMap = createFieldValueMap(context, rule);
             Map<String, String> alertAnnotations = createAlertAnnotations(rule, fieldValueMap);
-            AlertSingle alert = AlertSingle.builder()
+            AlertEvent alert = AlertEvent.builder()
                     .labels(alertLabels)
                     .annotations(alertAnnotations)
                     .content(AlertTemplateUtils.render(rule.getTemplate(), fieldValueMap))
@@ -287,7 +287,7 @@ public class LogPeriodicAlertCalculator {
         Map<String, String> fingerprints = new HashMap<>(8);
         // 写入告警名与规则 ID，作为最小收敛维度
         fingerprints.put(AlertConstants.LABEL_ALERT_NAME, rule.getName());
-        fingerprints.put(AlertConstants.LABEL_DEFINE_ID, String.valueOf(rule.getId()));
+        fingerprints.put(AlertConstants.LABEL_RULE_ID, String.valueOf(rule.getId()));
 
         // 合并规则自定义 labels，扩展收敛与展示维度
         if (rule.getLabels() != null) {

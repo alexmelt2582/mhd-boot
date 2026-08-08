@@ -59,13 +59,13 @@ public class PeriodicAlertRuleScheduler implements CommandLineRunner, Disposable
             return;
         }
         cancelSchedule(rule.getId());
-        if(AlertRuleTypeEnum.isPeriodicType(rule.getType())) {
+        if (AlertRuleTypeEnum.isPeriodicType(rule.getType())) {
             ScheduledTaskState state = new ScheduledTaskState(rule);
             ScheduledFuture<?> future = scheduledExecutor.scheduleAtFixedRate(() -> executeRule(rule),
                     0, rule.getPeriod(), TimeUnit.SECONDS);
             state.setScheduledFuture(future);
             scheduledTasks.put(rule.getId(), state);
-            log.info("[Alert] Scheduled periodic alert rule {} with period {} seconds.", rule.getId(), rule.getPeriod());
+            log.info("[Alert] Scheduled periodic alert rule {} with period {} seconds.", rule.getName(), rule.getPeriod());
         }
     }
 
@@ -99,9 +99,11 @@ public class PeriodicAlertRuleScheduler implements CommandLineRunner, Disposable
         private boolean running;
         private boolean pending;
         private boolean cancelled;
+
         private ScheduledTaskState(AlertRule rule) {
             this.rule = rule;
         }
+
         private synchronized void setScheduledFuture(ScheduledFuture<?> scheduledFuture) {
             this.scheduledFuture = scheduledFuture;
         }
