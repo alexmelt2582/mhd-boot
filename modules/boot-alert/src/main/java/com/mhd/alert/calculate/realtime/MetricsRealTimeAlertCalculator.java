@@ -1,380 +1,41 @@
 package com.mhd.alert.calculate.realtime;
 
-import com.mhd.alert.cache.AlarmCacheManager;
-import com.mhd.alert.config.AlertThreadPoolConfig;
-import com.mhd.alert.reduce.AlarmCommonReduce;
-import com.mhd.alert.service.AlertRuleService;
-import com.mhd.alert.utils.BackoffUtils;
-import com.mhd.alert.utils.ExponentialBackoff;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
-
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
+ * 实时指标告警计算器（占位实现，待迁移）。
  *
+ * <p>原 hertzbeat 的 {@code RealTimeAlertCalculator} 依赖大量外部基础设施：
+ * <ul>
+ *   <li>{@code CollectRep.MetricsData}：hertzbeat 采集层 protobuf 消息，mhd-boot 暂无对应实现；</li>
+ *   <li>{@code CommonDataQueue}：hertzbeat 进程内指标队列，mhd-boot 暂无对应实现；</li>
+ *   <li>{@code JexlExprCalculator}：JEXL 表达式引擎，尚未引入；</li>
+ *   <li>{@code AlertDefine} / {@code SingleAlert}：已重命名为 {@link com.mhd.alert.entity.AlertRule} /
+ *       {@link com.mhd.alert.entity.AlertEvent}，但本计算器的完整迁移需先补齐上述基础设施。</li>
+ * </ul>
+ *
+ * <p>当前收敛→分发→通知主链路（{@code AlarmCommonReduce → AlarmGroupReduce →
+ * AlarmInhibitReduce → AlarmSilenceReduce → AlertNoticeDispatch}）已打通，
+ * 周期性告警计算（{@link com.mhd.alert.calculate.periodic.LogPeriodicAlertCalculator}、
+ * {@link com.mhd.alert.calculate.periodic.MetricsPeriodicAlertCalculator}）已可用，
+ * 实时告警计算作为后续阶段单独迁移，避免阻塞当前主链路验证。
+ *
+ * <p><b>TODO:</b> 引入指标数据队列与 JEXL 表达式引擎后，参照 hertzbeat
+ * {@code RealTimeAlertCalculator} 重新实现，并将 {@code AlertDefine}→{@code AlertRule}、
+ * {@code SingleAlert}→{@code AlertEvent} 的命名映射补齐。
  *
  * @author zhao-hao-dong
- **/
+ */
 @Component
 @Slf4j
-public class MetricsRealTimeAlertCalculator implements CommandLineRunner {
-    private static final int CALCULATE_THREADS = 3;
+public class MetricsRealTimeAlertCalculator {
 
-    private static final String KEY_INSTANCE = "__instance__";
-    private static final String KEY_INSTANCE_NAME = "__instancename__";
-    private static final String KEY_INSTANCE_HOST = "__instancehost__";
-    private static final String KEY_APP = "__app__";
-    private static final String KEY_METRICS = "__metrics__";
-    private static final String KEY_PRIORITY = "__priority__";
-    private static final String KEY_CODE = "__code__";
-    private static final String KEY_AVAILABLE  = "__available__";
-    private static final String KEY_LABELS = "__labels__";
-    private static final String UP = "up";
-    private static final String DOWN = "down";
-    private static final String KEY_ROW = "__row__";
-
-    private static final Pattern APP_PATTERN = Pattern.compile("equals\\(__app__,\"([^\"]+)\"\\)");
-    private static final Pattern AVAILABLE_PATTERN = Pattern.compile("equals\\(__available__,\"([^\"]+)\"\\)");
-    private static final Pattern LABEL_PATTERN = Pattern.compile("contains\\(__labels__,\\s*\"([^\"]+)\"\\)");
-    private static final Pattern INSTANCE_PATTERN = Pattern.compile("equals\\(__instance__,\\s*\"(\\d+)\"\\)");
-    private static final Pattern METRICS_PATTERN = Pattern.compile("equals\\(__metrics__,\"([^\"]+)\"\\)");
-
-    private final AlertThreadPoolConfig alertThreadPoolConfig;
-    //private final CommonDataQueue dataQueue;
-    private final AlertRuleService alertRuleService;
-    private final AlarmCommonReduce alarmCommonReduce;
-    private final AlarmCacheManager alarmCacheManager;
-    //private final JexlExprCalculator jexlExprCalculator;
-
-
-    @Override
-    public void run(String... args) throws Exception {
-        startCalculate();
-    }
+    /**
+     * 实时计算入口待迁移：原实现从 {@code CommonDataQueue} 拉取 {@code CollectRep.MetricsData}
+     * 并逐条匹配实时告警规则。在指标队列与表达式引擎就绪前暂不启用。
+     */
     public void startCalculate() {
-        Runnable runnable = () -> {
-            ExponentialBackoff backoff = new ExponentialBackoff(50L, 1000L);
-            while (!Thread.currentThread().isInterrupted()) {
-                try {
-                    CollectRep.MetricsData metricsData = dataQueue.pollMetricsDataToAlerter();
-                    if (metricsData == null) {
-                        continue;
-                    }
-                    backoff.reset();
-                    calculate(metricsData);
-                    dataQueue.sendMetricsDataToStorage(metricsData);
-                } catch (InterruptedException ignored) {
-                    Thread.currentThread().interrupt();
-                } catch (CommonDataQueueUnknownException ue) {
-                    if (!BackoffUtils.shouldContinueAfterBackoff(backoff)) {
-                        break;
-                    }
-                } catch (Exception e) {
-                    log.error("calculate alarm error: {}.", e.getMessage(), e);
-                }
-            }
-        };
-        for (int i = 0; i < CALCULATE_THREADS; i++) {
-            alertThreadPoolConfig.executeJob(runnable);
-        }
-    }
-
-    protected void calculate(CollectRep.MetricsData metricsData) {
-        long currentTimeMilli = System.currentTimeMillis();
-        String instance = String.valueOf(metricsData.getId());
-        String instanceName = metricsData.getInstanceName();
-        String instanceHost = metricsData.getInstance();
-        String app = metricsData.getApp();
-        String metrics = metricsData.getMetrics();
-        if ((CommonConstants.PROMETHEUS_APP_PREFIX + instanceName).equals(metricsData.getApp())) {
-            app = CommonConstants.PROMETHEUS;
-        }
-        int priority = metricsData.getPriority();
-        int code = metricsData.getCode().getNumber();
-        Map<String, String> labels = metricsData.getLabels();
-        Map<String, String> annotations = metricsData.getAnnotations();
-        List<AlertDefine> thresholds = this.alertDefineService.getMetricsRealTimeAlertDefines();
-        // Filter thresholds by app, metrics, labels and instance
-        thresholds = filterThresholdsByAppAndMetrics(thresholds, app, metrics, labels, instance, priority);
-        if (thresholds.isEmpty()) {
-            return;
-        }
-        Map<String, Object> commonContext = new HashMap<>(8);
-        commonContext.put(KEY_INSTANCE, instance);
-        commonContext.put(KEY_INSTANCE_NAME, instanceName);
-        commonContext.put(KEY_INSTANCE_HOST, instanceHost);
-        commonContext.put(KEY_APP, app);
-        commonContext.put(KEY_PRIORITY, priority);
-        commonContext.put(KEY_CODE, code);
-        commonContext.put(KEY_METRICS, metrics);
-        commonContext.put(KEY_LABELS, String.join(",", kvLabelsToKvStringSet(labels)));
-        if (priority == 0) {
-            commonContext.put(KEY_AVAILABLE, metricsData.getCode() == CollectRep.Code.SUCCESS ? UP : DOWN);
-        }
-        if (labels != null) {
-            commonContext.putAll(labels);
-        }
-        List<CollectRep.Field> fields = metricsData.getFields();
-        Map<String, Object> fieldValueMap = new HashMap<>(8);
-        int valueRowCount = metricsData.getValuesCount();
-        for (AlertDefine define : thresholds) {
-            if (define.getLabels() == null) {
-                define.setLabels(new HashMap<>(8));
-            }
-            if (define.getAnnotations() == null) {
-                define.setAnnotations(new HashMap<>(8));
-            }
-            fieldValueMap.clear();
-            fieldValueMap.putAll(commonContext);
-            final String expr = define.getExpr();
-            if (StringUtils.isBlank(expr)) {
-                continue;
-            }
-            Long defineId = define.getId();
-            Map<String, String> commonFingerPrints = new HashMap<>(8);
-            // here use the alert name as finger, not care the alert name may be changed
-            commonFingerPrints.put(CommonConstants.LABEL_DEFINE_ID, String.valueOf(define.getId()));
-            commonFingerPrints.put(CommonConstants.LABEL_ALERT_NAME, define.getName());
-            commonFingerPrints.put(CommonConstants.LABEL_INSTANCE_NAME, instanceName);
-            commonFingerPrints.put(CommonConstants.LABEL_INSTANCE, instanceHost);
-            commonFingerPrints.putAll(define.getLabels());
-            if (labels != null) {
-                commonFingerPrints.putAll(labels);
-            }
-            {
-                // trigger the expr before the metrics data, due the available up down or others
-                try {
-                    boolean match = jexlExprCalculator.execAlertExpression(fieldValueMap, expr, true);
-                    try {
-                        if (match) {
-                            // If the threshold rule matches, the number of times the threshold has been triggered is determined and an alarm is triggered
-                            afterThresholdRuleMatch(defineId, currentTimeMilli, commonFingerPrints, fieldValueMap, define, annotations);
-                        } else {
-                            handleRecoveredAlert(defineId, commonFingerPrints);
-                        }
-                        // if this threshold pre compile success, ignore blew
-                        continue;
-                    } catch (Exception e) {
-                        log.error(e.getMessage(), e);
-                    }
-                } catch (Exception ignored) {}
-            }
-            Map<String, String> fingerPrints = new HashMap<>(8);
-            for (CollectRep.ValueRow valueRow : metricsData.getValues()) {
-                if (CollectionUtils.isEmpty(valueRow.getColumnsList())) {
-                    continue;
-                }
-                fieldValueMap.clear();
-                fieldValueMap.put(KEY_ROW, valueRowCount);
-                fieldValueMap.putAll(commonContext);
-                fingerPrints.clear();
-                fingerPrints.putAll(commonFingerPrints);
-                for (int index = 0; index < valueRow.getColumnsList().size(); index++) {
-                    String valueStr = valueRow.getColumns(index);
-                    final CollectRep.Field field = fields.get(index);
-                    if (CommonConstants.NULL_VALUE.equals(valueStr)) {
-                        fieldValueMap.put(field.getName(), null);
-                        continue;
-                    }
-                    final int fieldType = field.getType();
-
-                    if (fieldType == CommonConstants.TYPE_NUMBER) {
-                        final Double doubleValue;
-                        if ((doubleValue = CommonUtil.parseStrDouble(valueStr)) != null) {
-                            fieldValueMap.put(field.getName(), doubleValue);
-                        }
-                    } else if (fieldType == CommonConstants.TYPE_TIME) {
-                        final Integer integerValue;
-                        if ((integerValue = CommonUtil.parseStrInteger(valueStr)) != null) {
-                            fieldValueMap.put(field.getName(), integerValue);
-                        }
-                    } else {
-                        if (StringUtils.isNotEmpty(valueStr)) {
-                            fieldValueMap.put(field.getName(), valueStr);
-                        }
-                    }
-
-                    if (field.getLabel()) {
-                        fingerPrints.put(field.getName(), valueStr);
-                    }
-                }
-                try {
-                    boolean match = jexlExprCalculator.execAlertExpression(fieldValueMap, expr, false);
-                    try {
-                        if (match) {
-                            afterThresholdRuleMatch(defineId, currentTimeMilli, fingerPrints, fieldValueMap, define, annotations);
-                        } else {
-                            handleRecoveredAlert(defineId, fingerPrints);
-                        }
-                    } catch (Exception e) {
-                        log.error(e.getMessage(), e);
-                    }
-                } catch (Exception ignored) {}
-            }
-        }
-    }
-
-    /**
-     * Filter alert definitions by app, metrics and instance
-     *
-     * @param thresholds Alert definitions to filter
-     * @param app        Current app name
-     * @param metrics    Current metrics name
-     * @param labels     Current labels
-     * @param instance   Current instance id
-     * @param priority   Current priority
-     * @return Filtered alert definitions
-     */
-    public List<AlertDefine> filterThresholdsByAppAndMetrics(List<AlertDefine> thresholds, String app, String metrics, Map<String, String> labels, String instance, int priority) {
-        return thresholds.stream()
-                .filter(define -> {
-                    if (StringUtils.isBlank(define.getExpr())) {
-                        return false;
-                    }
-                    String expr = define.getExpr();
-
-                    // Extract and check app - required
-                    Matcher appMatcher = APP_PATTERN.matcher(expr);
-                    if (!appMatcher.find() || !app.equals(appMatcher.group(1))) {
-                        return false;
-                    }
-
-                    // Extract and check available - required
-                    if (priority != 0) {
-                        Matcher availableMatcher = AVAILABLE_PATTERN.matcher(expr);
-                        if (availableMatcher.find()) {
-                            return false;
-                        }
-                    }
-
-                    // Extract and check metrics - optional
-                    Matcher metricsMatcher = METRICS_PATTERN.matcher(expr);
-                    if (metricsMatcher.find() && !metrics.equals(metricsMatcher.group(1))) {
-                        return false;
-                    }
-
-                    // Extract and check instance - optional with multiple values
-                    Matcher instanceMatcher = INSTANCE_PATTERN.matcher(expr);
-                    Matcher labelMatcher = LABEL_PATTERN.matcher(expr);
-                    // If no instance and instance labels specified in expr, accept all instances
-                    if (!instanceMatcher.find() && !labelMatcher.find()) {
-                        return true;
-                    }
-
-                    // Reset matcher to check all instances
-                    instanceMatcher.reset();
-                    labelMatcher.reset();
-                    // If instances specified, current instance must match one of them
-                    while (instanceMatcher.find()) {
-                        if (Objects.equals(instance, instanceMatcher.group(1))) {
-                            return true;
-                        }
-                    }
-                    // If instance labels specified, current instance must match one of them
-                    Set<String> labelKvStringSet = kvLabelsToKvStringSet(labels);
-                    while (labelMatcher.find()) {
-                        String label = labelMatcher.group(1);
-                        if (labelKvStringSet.contains(label)) {
-                            return true;
-                        }
-                    }
-                    return false;
-                })
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Handle recovered alert
-     */
-    private void handleRecoveredAlert(Long defineId, Map<String, String> fingerprints) {
-        String fingerprint = AlertUtil.calculateFingerprint(fingerprints);
-        SingleAlert firingAlert = alarmCacheManager.removeFiring(defineId, fingerprint);
-        if (firingAlert != null) {
-            // todo consider multi times to tig for resolved alert
-            firingAlert.setTriggerTimes(1);
-            firingAlert.setEndAt(System.currentTimeMillis());
-            firingAlert.setStatus(CommonConstants.ALERT_STATUS_RESOLVED);
-            alarmCommonReduce.reduceAndSendAlarm(firingAlert.clone());
-        }
-        alarmCacheManager.removePending(defineId, fingerprint);
-    }
-
-
-    /**
-     * Handle alert after threshold rule match
-     */
-    private void afterThresholdRuleMatch(long defineId, long currentTimeMilli, Map<String, String> fingerPrints,
-                                         Map<String, Object> fieldValueMap, AlertDefine define,
-                                         Map<String, String> annotations) {
-        // fingerprint for the padding cache
-        String fingerprint = AlertUtil.calculateFingerprint(fingerPrints);
-        SingleAlert existingAlert = alarmCacheManager.getPending(defineId, fingerprint);
-        fieldValueMap.putAll(define.getLabels());
-        int requiredTimes = define.getTimes() == null ? 1 : define.getTimes();
-        if (existingAlert == null) {
-            // First time triggering alert, create new alert and set to pending status
-            Map<String, String> alertLabels = new HashMap<>(8);
-            alertLabels.putAll(fingerPrints);
-            Map<String, String> alertAnnotations = new HashMap<>(8);
-            if (annotations != null) {
-                alertAnnotations.putAll(annotations);
-            }
-            if (define.getAnnotations() != null) {
-                alertAnnotations.putAll(define.getAnnotations());
-            }
-            // render var content in annotations
-            for (Map.Entry<String, String> entry : alertAnnotations.entrySet()) {
-                entry.setValue(AlertTemplateUtil.render(entry.getValue(), fieldValueMap));
-            }
-            SingleAlert newAlert = SingleAlert.builder()
-                    .labels(alertLabels)
-                    .annotations(alertAnnotations)
-                    // render var content in content
-                    .content(AlertTemplateUtil.render(define.getTemplate(), fieldValueMap))
-                    .status(CommonConstants.ALERT_STATUS_PENDING)
-                    .triggerTimes(1)
-                    .startAt(currentTimeMilli)
-                    .activeAt(currentTimeMilli)
-                    .build();
-
-            // If required trigger times is 1, set to firing status directly
-            if (requiredTimes <= 1) {
-                newAlert.setStatus(CommonConstants.ALERT_STATUS_FIRING);
-                alarmCacheManager.putFiring(defineId, fingerprint, newAlert);
-                alarmCommonReduce.reduceAndSendAlarm(newAlert.clone());
-            } else {
-                // Otherwise put into pending queue first
-                alarmCacheManager.putPending(define.getId(), fingerprint, newAlert);
-            }
-        } else {
-            // Update existing alert
-            existingAlert.setTriggerTimes(existingAlert.getTriggerTimes() + 1);
-            existingAlert.setActiveAt(currentTimeMilli);
-
-            // Check if required trigger times reached
-            if (existingAlert.getStatus().equals(CommonConstants.ALERT_STATUS_PENDING) && existingAlert.getTriggerTimes() >= requiredTimes) {
-                // Reached trigger times threshold, change to firing status
-                alarmCacheManager.removePending(defineId, fingerprint);
-                existingAlert.setStatus(CommonConstants.ALERT_STATUS_FIRING);
-                alarmCacheManager.putFiring(defineId, fingerprint, existingAlert);
-                alarmCommonReduce.reduceAndSendAlarm(existingAlert.clone());
-            }
-        }
-    }
-
-    private Set<String> kvLabelsToKvStringSet(Map<String, String> labels) {
-        if (labels == null || labels.isEmpty()) {
-            return Collections.singleton("");
-        }
-        return labels.entrySet().stream()
-                .map(item -> item.getKey() + ":" + item.getValue())
-                .collect(Collectors.toSet());
+        log.warn("[Alert] MetricsRealTimeAlertCalculator is pending migration, real-time metric alert is disabled.");
     }
 }

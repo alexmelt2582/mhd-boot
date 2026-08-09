@@ -124,6 +124,64 @@ public List<OrderVO> queryOrders(QueryParam param) {
 }
 ```
 
+### 多步骤方法的编号流程注释模式
+
+对于执行流程清晰、可拆分为多个顺序步骤的方法（如周期性计算器、调度器、分发器、聚合收敛器等），
+采用「**JavaDoc 编号步骤 + 方法体编号注释**」的对应模式，帮助维护者快速建立"步骤地图"。
+
+这是本项目中多步骤业务方法的**首选注释模式**，参照
+`com.mhd.alert.calculate.periodic.LogPeriodicAlertCalculator`。
+
+**写法约定：**
+
+1. **JavaDoc 中用 `<ol><li>...</li></ol>` 列出主要执行步骤**，每步一句话说明意图（做什么、为什么），
+   形成"步骤总览"。JavaDoc 概述段（`<p>执行流程：`）引导该列表。
+2. **方法体内部用 `// 1. ...`、`// 2. ...`、`// 3. ...` 编号注释**，与 JavaDoc 步骤**一一对应**，
+   放在每个步骤的逻辑块**之前**。编号注释既要呼应 JavaDoc 步骤，也要补充该步骤的关键意图。
+3. **在关键或非直觉的代码处，补充额外的行内注释**说明意图（说"为什么"而非翻译代码），
+   例如兜底捕获、降级策略、防并发污染等。
+4. **异常捕获处必须说明兜底/补偿意图**，例如"单条规则异常不应影响其他规则的调度"。
+5. 步骤编号在方法体内**连续递增**，不跳号；同一方法内不重复编号。
+6. 当步骤内含子流程时，子流程用普通行内注释（不编号）说明即可，避免编号层级混乱。
+
+**示例（参照 LogPeriodicAlertCalculator）：**
+
+```java
+/**
+ * 周期性告警计算入口。
+ *
+ * <p>执行流程：
+ * <ol>
+ *   <li>校验规则启用状态与表达式是否为空，不满足则直接跳过；</li>
+ *   <li>委托 {@link #doCalculate(AlertRule)} 执行实际查询与告警生成；</li>
+ *   <li>捕获计算过程中的异常并记录错误日志，避免单条规则异常中断整个调度周期。</li>
+ * </ol>
+ *
+ * @param rule 待计算的告警规则
+ */
+public void calculate(AlertRule rule) {
+    // 1. 前置校验：规则被禁用或表达式为空时直接终止，避免无效查询
+    if (Objects.equals(rule.getEnable(), EnableEnum.DISABLE.getCode()) ||
+            StringUtils.isBlank(rule.getExpr())) {
+        log.error("Alert periodic log rule {} is disabled or expression is empty", rule.getName());
+        return;
+    }
+    try {
+        // 2. 执行实际的数据查询与告警生成逻辑
+        doCalculate(rule);
+    } catch (Exception e) {
+        // 3. 兜底捕获：单条规则异常不应影响其他规则的调度
+        log.error("Calculate periodic log rule {} failed: {}", rule.getName(), e.getMessage());
+    }
+}
+```
+
+**适用判断：**
+
+- ✅ 适合：计算器、调度器、分发器、聚合收敛器、模板渲染等流程清晰的多步骤方法。
+- ❌ 不适合：单一查询、简单 CRUD、纯映射转换、getter/setter——直接用普通行内注释即可，
+  强行编号反而增加噪音。
+
 ### 常见内部注释问题
 
 | 问题 | 示例 | 修正方向 |
