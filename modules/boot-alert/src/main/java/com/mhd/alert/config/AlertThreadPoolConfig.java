@@ -1,6 +1,7 @@
 package com.mhd.alert.config;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.stereotype.Component;
@@ -14,6 +15,7 @@ import java.util.concurrent.*;
  */
 @Component
 @Slf4j
+@Getter
 public class AlertThreadPoolConfig implements DisposableBean {
     /**
      * 线程中的任务在接收到应用关闭信号量后最多等待多久就强制终止，其实就是给剩余任务预留的时间， 到时间后线程池必须销毁
@@ -36,13 +38,17 @@ public class AlertThreadPoolConfig implements DisposableBean {
      */
     private final ThreadPoolExecutor logWorkerExecutor;
 
+    private final ThreadPoolExecutor alertReduceWorkerExecutor;
+
     public AlertThreadPoolConfig() {
         this.workerExecutor = buildWorkerExecutor();
         this.notifyExecutor = buildNotifyExecutor();
         this.logWorkerExecutor = buildLogWorkExecutor();
+        this.alertReduceWorkerExecutor = buildAlertReduceWorkerExecutor();
         printExecutorStatus(workerExecutor, "Work");
         printExecutorStatus(notifyExecutor, "Notify");
         printExecutorStatus(logWorkerExecutor, "LogWork");
+        printExecutorStatus(alertReduceWorkerExecutor, "AlertReduceWorker");
     }
 
     public void executeJob(Runnable runnable) throws RejectedExecutionException {
@@ -120,11 +126,33 @@ public class AlertThreadPoolConfig implements DisposableBean {
                 new ThreadPoolExecutor.AbortPolicy());
     }
 
+    /**
+     * 构建线程池
+     *
+     * @return ThreadPoolExecutor
+     */
+    private ThreadPoolExecutor buildAlertReduceWorkerExecutor() {
+        ThreadFactory threadFactory = new ThreadFactoryBuilder()
+                .setUncaughtExceptionHandler((thread, throwable) -> {
+                    log.error("[Alert] AlertReduceWorker thread pool has uncaughtException. Thread: {}, Error: {}", thread.getName(), throwable.getMessage(), throwable);
+                })
+                .setDaemon(true)
+                .setNameFormat("alert-reduce-worker-%d")
+                .build();
+        return new ThreadPoolExecutor(2,
+                2, 10,
+                TimeUnit.SECONDS,
+                new LinkedBlockingQueue<>(1000),
+                threadFactory,
+                new ThreadPoolExecutor.AbortPolicy());
+    }
+
     @Override
     public void destroy() throws Exception {
         closeExecutor(workerExecutor, "Worker");
         closeExecutor(notifyExecutor, "Notify");
         closeExecutor(logWorkerExecutor, "LogWorker");
+        closeExecutor(alertReduceWorkerExecutor, "AlertReduceWorker");
     }
 
     /**
